@@ -10,7 +10,7 @@ This project was started during the [Tiny_Hack_v1](https://luma.com/59rubmuv) by
 - [Gianfranco Poncini](https://github.com/Muwattalli)
 - [Alberto Castronovo](https://github.com/albertocastronovo)
 
-Please read [README_upstream.md](README_upstream.md) for the Hackathon rules.
+For the detailed rules of the Tiny_Hack_v1 Hackathon please read [here](README.md).
 
 ## Project Description
 
