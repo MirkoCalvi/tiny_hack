@@ -115,15 +115,55 @@ cd external/Z-Ant
   --shape 1,3,224,224
 ```
 
+<!-- (2025-10-04 18:53 CEST) -->
+
 Result:
 
 ```text
-TODO
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ ./zant input_setter \
+  --model mnist-8 \
+  --shape 1,3,224,224
+Executing: python3 src/onnx/input_setter.py --model mnist-8 --shape 1,3,224,224
+
+Processing: datasets/models/mnist-8/mnist-8.onnx
+Target shape: [1, 3, 224, 224]
+✅ Model loaded successfully
+Original model: 8 nodes, 7 initializers
+
+1. Fixing initializer validation issues...
+Creating dummy inputs for 7 initializers...
+Added 7 dummy inputs for initializers
+
+2. Setting input shape...
+Warning: Input 'data' not found. Available inputs:
+  - Input3
+  - Parameter87
+  - Parameter5
+  - Pooling160_Output_0_reshape0_shape
+  - Parameter194
+  - Parameter193_reshape1
+  - _v_23
+  - _v_24
+Using first input: Input3
+Updated input 'Input3' shape to: [1, 3, 224, 224]
+
+3. Running shape inference...
+✅ Shape inference successful
+
+4. Simplifying model...
+Attempting model simplification...
+✅ Standard simplification successful!
+
+5. Saving model to: datasets/models/mnist-8/mnist-8.onnx
+✅ Model saved successfully!
+
+Final model: 8 nodes, 7 initializers
+
+🎉 Model processing completed successfully!
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
 ### Run `./zant create mnist-8`
-
-<!-- (2025-10-04 18:43 CEST) -->
 
 Command:
 
@@ -131,11 +171,12 @@ Command:
 ./zant create mnist-8
 ```
 
+<!-- (2025-10-04 18:54 CEST) -->
+
 Result:
 
 ```text
-vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ cd external/Z-Ant/
-vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ uv run ./zant create mnist-8
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ ./zant create mnist-8
 ======================================
 Model Pipeline for: mnist-8
 Model path: datasets/models/mnist-8/mnist-8.onnx
@@ -194,13 +235,7 @@ Generated test file: generated/mnist-8/test_mnist-8.zig
 [SUCCESS] Library code generation completed
 [STEP] Testing generated library...
 lib-test
-└─ run test_generated_lib stderr
- ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++ testing mnist-8 ++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++
---- Random data Prediction Test ---
-Prediction done without errors
-
+└─ run test_generated_lib 5/6 passed, 1 failed
 --- Wrong Input Shape test ---
 
 --- Empty Input test ---
@@ -209,23 +244,24 @@ Prediction done without errors
 
 --- User data Prediction test ---
 User tests are disabled for this model
-[SUCCESS] Library tests completed
-[STEP] Building static library...
-[SUCCESS] Static library build completed
-
-======================================
-[SUCCESS] Pipeline completed successfully!
-======================================
-Model: mnist-8
-Generated files should be in: generated/mnist-8/
-Static library should be in: zig-out/mnist-8/
-
-Additional commands you can run:
-  zig build lib-exe -Dmodel=mnist-8    # Run the generated model executable
-  zig build benchmark -Dmodel=mnist-8  # Run performance benchmarks
-  zig build test -Dmodel=mnist-8       # Run unit tests
-======================================
-vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
+error: 'test_mnist-8.test.Static Library - Random data Prediction Test' failed:  ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++ testing mnist-8 ++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--- Random data Prediction Test ---expected 0, found -1
+/opt/zig/lib/std/testing.zig:103:17: 0x10e406c in expectEqualInner__anon_19082 (test_generated_lib)
+                return error.TestExpectedEqual;
+                ^
+/workspaces/BeezzaAnts/external/Z-Ant/generated/mnist-8/test_mnist-8.zig:126:5: 0x10e4552 in test.Static Library - Random data Prediction Test (test_generated_lib)
+    try std.testing.expectEqual(0, return_code);
+    ^
+error: while executing test 'test_mnist-8.test.Static Library - User data Prediction Test', the following test command failed:
+/workspaces/BeezzaAnts/external/Z-Ant/.zig-cache/o/82ae57f721908fbeff2d5cc7fac20a27/test_generated_lib --seed=0x9a8188a6 --cache-dir=/workspaces/BeezzaAnts/external/Z-Ant/.zig-cache --listen=- 
+Build Summary: 3/5 steps succeeded; 1 failed; 5/6 tests passed; 1 failed
+lib-test transitive failure
+└─ run test_generated_lib 5/6 passed, 1 failed
+error: the following build command failed with exit code 1:
+/workspaces/BeezzaAnts/external/Z-Ant/.zig-cache/o/7f05b28ce341a8b494228600978483eb/build /opt/zig/zig /opt/zig/lib /workspaces/BeezzaAnts/external/Z-Ant /workspaces/BeezzaAnts/external/Z-Ant/.zig-cache /home/vscode/.cache/zig --seed 0x9a8188a6 -Zefe428e8f8a3674e lib-test -Dmodel=mnist-8
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
 <!--
@@ -267,9 +303,9 @@ rw-r--r-- 0/0 2481672 Jan  1 00:00 1970 /workspaces/Z-Ant/.zig-cache/o/b860c1ea0
 ```
 -->
 
-### 2. Build the static library with Zig
+### 2. Build the static library of model "beer" with Zig
 
-<!-- (2025-10-04 17:42 CEST) -->
+<!-- (2025-10-04 18:55 CEST) -->
 
 TODO
 
@@ -279,24 +315,24 @@ TODO
 
 #### Run `zig build lib-gen`
 
-<!-- (2025-10-04 17:45 CEST) -->
-
 Command:
 
 ```bash
 zig build lib-gen \
-  -Dmodel="mnist-8" \
+  -Dmodel="beer" \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
   -Denable_user_tests
 ```
 
+<!-- (2025-10-04 17:45 CEST) -->
+
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ zig build lib-gen \
-  -Dmodel="mnist-8" \
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ zig build lib-gen \
+  -Dmodel="beer" \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
@@ -304,9 +340,9 @@ Result:
 
 
 codegenOptions: 
-     model:mnist-8 
-     model_path:datasets/models/mnist-8/mnist-8.onnx 
-     generated_path:generated/mnist-8/ 
+     model:beer 
+     model_path:datasets/models/beer/beer.onnx 
+     generated_path:generated/beer/ 
      user_tests:true 
      log:false 
      shape: 
@@ -314,65 +350,214 @@ codegenOptions:
      output_type:f32 
      comm:false 
      dynamic:true 
-     version:v1 info: 
- .......... file created, path:generated/mnist-8/static_parameters.zig
+     version:v1 
+
+ --- Linearized Graph post fusion : 
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D__40 
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D__40_0_QuantizeLinear 
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D_quant 
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D_DequantizeLinear 
+  Relu6__5 
+  Relu6__5_0_QuantizeLinear 
+  model_1/expanded_conv_depthwise_relu/Relu6;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D_quant 
+  model_1/expanded_conv_depthwise_relu/Relu6;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D_DequantizeLinear 
+  Relu6__7 
+  Relu6__7_0_QuantizeLinear 
+  model_1/expanded_conv_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/expanded_conv_project/Conv2D1_quant 
+  model_1/block_1_expand_relu/Relu6;model_1/block_1_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_expand/Conv2D_quant 
+  model_1/block_1_expand_relu/Relu6;model_1/block_1_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_expand/Conv2D_DequantizeLinear 
+  Relu6__10 
+  Relu6__10_0_QuantizeLinear 
+  model_1/block_1_depthwise_relu/Relu6;model_1/block_1_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_depthwise/depthwise_quant 
+  model_1/block_1_depthwise_relu/Relu6;model_1/block_1_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_depthwise/depthwise_DequantizeLinear 
+  Relu6__12 
+  Relu6__12_0_QuantizeLinear 
+  model_1/block_1_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/block_1_project/Conv2D1_quant 
+  model_1/block_1_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/block_1_project/Conv2D1_DequantizeLinear 
+  model_1/block_2_expand_relu/Relu6;model_1/block_2_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_expand/Conv2D_quant 
+  model_1/block_2_expand_relu/Relu6;model_1/block_2_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_expand/Conv2D_DequantizeLinear 
+  Relu6__15 
+  Relu6__15_0_QuantizeLinear 
+  model_1/block_2_depthwise_relu/Relu6;model_1/block_2_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_depthwise/depthwise_quant 
+  model_1/block_2_depthwise_relu/Relu6;model_1/block_2_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_depthwise/depthwise_DequantizeLinear 
+  Relu6__17 
+  Relu6__17_0_QuantizeLinear 
+  model_1/block_2_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D1_quant 
+  model_1/block_2_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D1_DequantizeLinear 
+  model_1/block_2_add/add 
+  model_1/block_2_add/add_QuantizeLinear 
+  model_1/block_3_expand_relu/Relu6;model_1/block_3_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_3_expand/Conv2D_quant 
+  model_1/block_3_expand_relu/Relu6;model_1/block_3_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_3_expand/Conv2D_DequantizeLinear 
+  Relu6__20 
+  Relu6__20_0_QuantizeLinear 
+  model_1/block_3_depthwise_relu/Relu6;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise_quant 
+  model_1/block_3_depthwise_relu/Relu6;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise_DequantizeLinear 
+  Relu6__22 
+  Relu6__22_0_QuantizeLinear 
+  model_1/block_3_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_3_project/Conv2D1_quant 
+  model_1/block_3_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_3_project/Conv2D1_DequantizeLinear 
+  model_1/block_4_expand_relu/Relu6;model_1/block_4_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_expand/Conv2D_quant 
+  model_1/block_4_expand_relu/Relu6;model_1/block_4_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_expand/Conv2D_DequantizeLinear 
+  Relu6__25 
+  Relu6__25_0_QuantizeLinear 
+  model_1/block_4_depthwise_relu/Relu6;model_1/block_4_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_depthwise/depthwise_quant 
+  model_1/block_4_depthwise_relu/Relu6;model_1/block_4_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_depthwise/depthwise_DequantizeLinear 
+  Relu6__27 
+  Relu6__27_0_QuantizeLinear 
+  model_1/block_4_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_4_project/Conv2D1_quant 
+  model_1/block_4_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_4_project/Conv2D1_DequantizeLinear 
+  model_1/block_4_add/add 
+  model_1/block_4_add/add_QuantizeLinear 
+  model_1/block_5_expand_relu/Relu6;model_1/block_5_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_5_expand/Conv2D_quant 
+  model_1/block_5_expand_relu/Relu6;model_1/block_5_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_5_expand/Conv2D_DequantizeLinear 
+  Relu6__30 
+  Relu6__30_0_QuantizeLinear 
+  model_1/block_5_depthwise_relu/Relu6;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_quant 
+  model_1/block_5_depthwise_relu/Relu6;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_DequantizeLinear 
+  Relu6__32 
+  Relu6__32_0_QuantizeLinear 
+  model_1/block_5_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D1_quant 
+  model_1/block_5_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D1_DequantizeLinear 
+  model_1/block_5_add/add 
+  model_1/block_5_add/add_QuantizeLinear 
+  model_1/block_6_expand_relu/Relu6;model_1/block_6_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_quant 
+  model_1/block_6_expand_relu/Relu6;model_1/block_6_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_DequantizeLinear 
+  Relu6__35 
+  Relu6__35_0_QuantizeLinear 
+  model_1/head/Relu;model_1/head/BiasAdd;model_1/head/Conv2D;head/bias_quant 
+  model_1/head/Relu;model_1/head/BiasAdd;model_1/head/Conv2D;head/bias_DequantizeLinear 
+  Relu__37 
+  Relu__37_0_QuantizeLinear 
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1_quant 
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1_DequantizeLinear 
+  StatefulPartitionedCall:0 
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1__142 
+
+ Pre-Fusion nodes: 79 
+ Post-Fusion nodes: 79
 info: 
- .......... file created, path:generated/mnist-8/lib_mnist-8.zig
+ .......... file created, path:generated/beer/static_parameters.zig
 info: 
+ .......... file created, path:generated/beer/lib_beer.zig
+info: Attempting to build ExecutionPlan with 79 nodes...
+info: ExecutionPlan built successfully with 79 steps!
 
-Generated test file: generated/mnist-8/test_mnist-8.zig
 
+graph.deinit() ------------- 
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D__40.deinit()  
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D__40_0_QuantizeLinear.deinit()  
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D_quant.deinit()  
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D_DequantizeLinear.deinit()  
+  Relu6__5.deinit()  
+  Relu6__5_0_QuantizeLinear.deinit()  
+  model_1/expanded_conv_depthwise_relu/Relu6;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D_quant.deinit()  
+  model_1/expanded_conv_depthwise_relu/Relu6;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D_DequantizeLinear.deinit()  
+  Relu6__7.deinit()  
+  Relu6__7_0_QuantizeLinear.deinit()  
+  model_1/expanded_conv_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/expanded_conv_project/Conv2D1_quant.deinit()  
+  model_1/block_1_expand_relu/Relu6;model_1/block_1_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_expand/Conv2D_quant.deinit()  
+  model_1/block_1_expand_relu/Relu6;model_1/block_1_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__10.deinit()  
+  Relu6__10_0_QuantizeLinear.deinit()  
+  model_1/block_1_depthwise_relu/Relu6;model_1/block_1_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_depthwise/depthwise_quant.deinit()  
+  model_1/block_1_depthwise_relu/Relu6;model_1/block_1_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_depthwise/depthwise_DequantizeLinear.deinit()  
+  Relu6__12.deinit()  
+  Relu6__12_0_QuantizeLinear.deinit()  
+  model_1/block_1_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/block_1_project/Conv2D1_quant.deinit()  
+  model_1/block_2_expand_relu/Relu6;model_1/block_2_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_expand/Conv2D_quant.deinit()  
+  model_1/block_1_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/block_1_project/Conv2D1_DequantizeLinear.deinit()  
+  model_1/block_2_expand_relu/Relu6;model_1/block_2_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__15.deinit()  
+  Relu6__15_0_QuantizeLinear.deinit()  
+  model_1/block_2_depthwise_relu/Relu6;model_1/block_2_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_depthwise/depthwise_quant.deinit()  
+  model_1/block_2_depthwise_relu/Relu6;model_1/block_2_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_depthwise/depthwise_DequantizeLinear.deinit()  
+  Relu6__17.deinit()  
+  Relu6__17_0_QuantizeLinear.deinit()  
+  model_1/block_2_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D1_quant.deinit()  
+  model_1/block_2_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D1_DequantizeLinear.deinit()  
+  model_1/block_2_add/add.deinit()  
+  model_1/block_2_add/add_QuantizeLinear.deinit()  
+  model_1/block_3_expand_relu/Relu6;model_1/block_3_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_3_expand/Conv2D_quant.deinit()  
+  model_1/block_3_expand_relu/Relu6;model_1/block_3_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_3_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__20.deinit()  
+  Relu6__20_0_QuantizeLinear.deinit()  
+  model_1/block_3_depthwise_relu/Relu6;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise_quant.deinit()  
+  model_1/block_3_depthwise_relu/Relu6;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise_DequantizeLinear.deinit()  
+  Relu6__22.deinit()  
+  Relu6__22_0_QuantizeLinear.deinit()  
+  model_1/block_3_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_3_project/Conv2D1_quant.deinit()  
+  model_1/block_4_expand_relu/Relu6;model_1/block_4_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_expand/Conv2D_quant.deinit()  
+  model_1/block_3_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_3_project/Conv2D1_DequantizeLinear.deinit()  
+  model_1/block_4_expand_relu/Relu6;model_1/block_4_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__25.deinit()  
+  Relu6__25_0_QuantizeLinear.deinit()  
+  model_1/block_4_depthwise_relu/Relu6;model_1/block_4_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_depthwise/depthwise_quant.deinit()  
+  model_1/block_4_depthwise_relu/Relu6;model_1/block_4_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_depthwise/depthwise_DequantizeLinear.deinit()  
+  Relu6__27.deinit()  
+  Relu6__27_0_QuantizeLinear.deinit()  
+  model_1/block_4_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_4_project/Conv2D1_quant.deinit()  
+  model_1/block_4_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_4_project/Conv2D1_DequantizeLinear.deinit()  
+  model_1/block_4_add/add.deinit()  
+  model_1/block_4_add/add_QuantizeLinear.deinit()  
+  model_1/block_5_expand_relu/Relu6;model_1/block_5_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_5_expand/Conv2D_quant.deinit()  
+  model_1/block_5_expand_relu/Relu6;model_1/block_5_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_5_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__30.deinit()  
+  Relu6__30_0_QuantizeLinear.deinit()  
+  model_1/block_5_depthwise_relu/Relu6;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_quant.deinit()  
+  model_1/block_5_depthwise_relu/Relu6;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__32.deinit()  
+  Relu6__32_0_QuantizeLinear.deinit()  
+  model_1/block_5_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D1_quant.deinit()  
+  model_1/block_5_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D1_DequantizeLinear.deinit()  
+  model_1/block_5_add/add.deinit()  
+  model_1/block_5_add/add_QuantizeLinear.deinit()  
+  model_1/block_6_expand_relu/Relu6;model_1/block_6_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_quant.deinit()  
+  model_1/block_6_expand_relu/Relu6;model_1/block_6_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__35.deinit()  
+  Relu6__35_0_QuantizeLinear.deinit()  
+  model_1/head/Relu;model_1/head/BiasAdd;model_1/head/Conv2D;head/bias_quant.deinit()  
+  model_1/head/Relu;model_1/head/BiasAdd;model_1/head/Conv2D;head/bias_DequantizeLinear.deinit()  
+  Relu__37.deinit()  
+  Relu__37_0_QuantizeLinear.deinit()  
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1_quant.deinit()  
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1_DequantizeLinear.deinit()  
+  StatefulPartitionedCall:0.deinit()  
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1__142.deinit()  info: 
 
-=========== ONNX Model Details ===========
-Model version: onnx.onnx.Version.IR_VERSION_2019_1_22
-Producer: CNTK
+Generated test file: generated/beer/test_beer.zig
 
-Graph Statistics:
-  Number of nodes: 8
-  Operator distribution:
-    Reshape: 1
-    Conv: 2
-    Gemm: 1
-    Relu: 2
-    MaxPool: 2
-
-Memory Requirements:
-  Total tensors: 9
-  Total weight size: 23992 bytes (0.02 MB)
-=========================================
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
 #### Run `zig build lib-test`
 
-<!-- (2025-10-02 15:09 CEST) -->
-
 ```bash
 zig build lib-test \
-  -Dmodel="mnist-8" \
+  -Dmodel="beer" \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
   -Denable_user_tests
 ```
 
+<!-- (2025-10-04 18:58 CEST) -->
+
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ zig build lib-test \
-  -Dmodel="mnist-8" \
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ zig build lib-test \
+  -Dmodel="beer" \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
   -Denable_user_tests
 lib-test
 └─ run test_generated_lib stderr
- ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++ testing mnist-8 ++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ +++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++ testing beer ++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++
 --- Random data Prediction Test ---
-Prediction done without errors:
-
+Prediction done without errors
 
 --- Wrong Input Shape test ---
 
@@ -383,51 +568,60 @@ Prediction done without errors:
 --- User data Prediction test ---
 User tests loaded.
 
-        Running user test: mnist-8
-
- 
- expected output  ->  real value      difference  
- -4.1226494e-1 ->  -4.1226524e-1      2.9802322e-7  
- -9.490775e-3 ->  -9.490378e-3      3.9674342e-7  
- 6.233672e-1 ->  6.2336653e-1      6.556511e-7  
- 6.694817e-1 ->  6.6948164e-1      5.9604645e-8  
- -6.0755527e-1 ->  -6.0755515e-1      1.1920929e-7  
- 1.0273058e0 ->  1.0273058e0      0e0  
- -5.273663e-1 ->  -5.273664e-1      1.1920929e-7  
- -1.7929406e-1 ->  -1.7929403e-1      2.9802322e-8  
- -3.159709e-1 ->  -3.159712e-1      2.9802322e-7  
- -8.7684447e-1 ->  -8.7684494e-1      4.7683716e-7 
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+        Running user test: beer
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
 #### Run `zig build lib`
 
-<!-- (2025-10-02 15:10 CEST) -->
-
 ```bash
 zig build lib \
-  -Dmodel="mnist-8" \
+  -Dmodel="beer" \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
   -Denable_user_tests
 ```
+
+<!-- (2025-10-04 18:58 CEST) -->
 
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ zig build lib \
-  -Dmodel="mnist-8" \
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ zig build lib \
+  -Dmodel="beer" \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
   -Denable_user_tests
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
-This should generate a `libzant.a` (or similar) under your Zig build output.
+Inspect generated code:
 
-TODO
+```text
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ ls -la generated/beer/
+total 612
+drwxr-xr-x 2 vscode vscode   4096 Oct  4 16:02 .
+drwxr-xr-x 4 vscode vscode   4096 Oct  4 16:02 ..
+-rw-r--r-- 1 vscode vscode 145536 Oct  4 16:55 lib_beer.zig
+-rw-r--r-- 1 vscode vscode    408 Oct  4 16:55 model_options.zig
+-rw-r--r-- 1 vscode vscode 198516 Oct  4 16:55 static_parameters.zig
+-rw-r--r-- 1 vscode vscode  12116 Oct  4 16:55 test_beer.zig
+-rw-r--r-- 1 vscode vscode 253848 Oct  4 16:55 user_tests.json
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
+```
+
+This should also generate a `libzant.a` (or similar) under your Zig build output.
+
+```text
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ ls -la zig-out/beer/
+total 3640
+drwxr-xr-x 2 vscode vscode    4096 Oct  4 16:58 .
+drwxr-xr-x 4 vscode vscode    4096 Oct  4 16:58 ..
+-rw-r--r-- 1 vscode vscode 3716476 Oct  4 16:58 libzant.a
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
+```
 
 ### 3. Package as an Arduino library
 
