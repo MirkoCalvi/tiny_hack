@@ -1,6 +1,6 @@
-# Testing Z-Ant on labai-ubnt02
+# HOWTO Deploy BeezzaAnts on Nicla Vision
 
-<!-- (2025-10-02 13:20 CEST) -->
+<!-- (2025-10-04 17:28 CEST) -->
 
 ## Reference Documents
 
@@ -11,7 +11,7 @@
  
 ## Step-by-step instructions
 
-<!-- (2025-10-03 15:00 CEST) -->
+<!-- (2025-10-04 17:29 CEST) -->
 
 1. Launch Visual Studio Code
 
@@ -22,7 +22,7 @@
 3. VS Code Command Palette: Git: Clone
 
    - Repository: Clone from GitHub
-   - Repository Name: `B-AROL-O/Z-Ant`
+   - Repository Name: `B-AROL-O/BeezzaAnts`
 
 4. When asked for "Would you like to open the cloned repository?" click **Open**.
 
@@ -34,45 +34,13 @@
 
 8. VS Code: Terminal > New Terminal
 
-<!--
-**NOTE**: The default shell for user `vscode` is `/bin/sh`:
+### Make sure that submodules are checked out
 
-```text
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ grep vscode /etc/passwd
-vscode:x:1004:1004::/home/vscode:/bin/sh
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$
-```
-
-**TODO**: Configure `.devcontainer/Dockerfile` to set default shell for user `vscode` to `bash`.
-
-Fixed with <https://github.com/B-AROL-O/Z-Ant/commit/3fd630faa4a202dddb6d9888df01390c517a8361>
-
-**WORKAROUND**: From the Terminal drop-down menu, select `bash`.
--->
-
-<!--
-**TODO**: Configure `.devcontainer/devcontainer.json` to install the following recommended extensions:
-
-- [Container Tools](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-containers)
-
-Fixed with <https://github.com/B-AROL-O/Z-Ant/commit/c6eab12a4fadcc0395b635c5831d2213c6e60bbd>
--->
-
-<!--
-**TODO**: Install Arduino CLI:
+Logged in as `vscode@container`
 
 ```bash
-TODO
+git submodule update --init --recursive
 ```
--->
-
-<!--
-**TODO**: Install Arduino Nicla Vision DFU:
-
-```bash
-TODO
-```
--->
 
 ### Verify prerequisites
 
@@ -89,42 +57,24 @@ dfu-util --version
 # TODO ./zant
 ```
 
-<!--
-Result (with base image: ubuntu:22.04):
-
-```text
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ echo $SHELL
-/bin/sh
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ python --version
-Python 3.10.12
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ pip --version
-pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ zig version
-0.14.0
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ uv --version
-uv 0.8.22
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$
-```
--->
-
-<!-- 2025-10-03 15:03 CEST -->
+<!-- 2025-10-04 17:32 CEST -->
 
 Result:
 
 ```text
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ echo $SHELL
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ echo $SHELL
 /bin/bash
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ python --version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ python --version
 Python 3.10.12
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ pip --version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ pip --version
 pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ uv --version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ uv --version
 uv 0.8.22
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ zig version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ zig version
 0.14.0
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ arduino-cli version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ arduino-cli version
 arduino-cli  Version: 1.3.1 Commit: 08ff7e2b Date: 2025-08-28T13:51:45Z
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ dfu-util --version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ dfu-util --version
 dfu-util 0.9
 
 Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
@@ -132,7 +82,7 @@ Copyright 2010-2016 Tormod Volden and Stefan Schmidt
 This program is Free Software and has ABSOLUTELY NO WARRANTY
 Please report bugs to http://sourceforge.net/p/dfu-util/tickets/
 
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) 
 ```
 
 ### Install Python dependencies
@@ -140,7 +90,8 @@ vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
 ```bash
 uv venv
 source .venv/bin/activate
-uv pip install onnx onnxruntime onnxsim
+uv pip install onnx onnxruntime
+# TODO uv pip install onnx onnxruntime onnxsim
 ```
 
 <!--
