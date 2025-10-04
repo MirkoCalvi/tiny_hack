@@ -88,10 +88,11 @@ vscode ➜ /workspaces/BeezzaAnts (gmacario/dev)
 ### Install Python dependencies
 
 ```bash
+sudo apt update && sudo apt -y install cmake
+# cd /workspaces/BeezzaAnts
 uv venv
 source .venv/bin/activate
-uv pip install onnx onnxruntime
-# TODO uv pip install onnx onnxruntime onnxsim
+uv pip install onnx onnxruntime onnxsim
 ```
 
 <!--
@@ -100,15 +101,34 @@ uv pip install onnx onnxruntime
 
 **TODO**: Add to `.devcontainer/devcontainer.json`
 
-### TEST: Run `./zant create mnist-8`
+### Change working directory
 
-<!-- (2025-10-04 17:40 CEST) -->
+```bash
+cd external/Z-Ant
+```
+
+### Run `./zant input_setter`
+
+```bash
+./zant input_setter \
+  --model mnist-8 \
+  --shape 1,3,224,224
+```
+
+Result:
+
+```text
+TODO
+```
+
+### Run `./zant create mnist-8`
+
+<!-- (2025-10-04 18:43 CEST) -->
 
 Command:
 
 ```bash
-cd external/Z-Ant
-uv run ./zant create mnist-8
+./zant create mnist-8
 ```
 
 Result:
