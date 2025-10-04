@@ -100,20 +100,22 @@ uv pip install onnx onnxruntime
 
 **TODO**: Add to `.devcontainer/devcontainer.json`
 
-### Run `./zant create mnist-8`
+### TEST: Run `./zant create mnist-8`
 
-<!-- (2025-10-03 15:04 CEST) -->
+<!-- (2025-10-04 17:40 CEST) -->
 
 Command:
 
 ```bash
+cd external/Z-Ant
 uv run ./zant create mnist-8
 ```
 
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ uv run ./zant create mnist-8
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ cd external/Z-Ant/
+vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ uv run ./zant create mnist-8
 ======================================
 Model Pipeline for: mnist-8
 Model path: datasets/models/mnist-8/mnist-8.onnx
@@ -203,7 +205,7 @@ Additional commands you can run:
   zig build benchmark -Dmodel=mnist-8  # Run performance benchmarks
   zig build test -Dmodel=mnist-8       # Run unit tests
 ======================================
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
 <!-- (2025-10-03 15:13 CEST) -->
