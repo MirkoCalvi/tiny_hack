@@ -4,7 +4,7 @@ An open-source swarm of buzzing bots and crawling code, powered by pizza, [Focoo
 
 ## Copyright and license
 
-Copyright (C) 2023-2025, [B-AROL-O Team](https://github.com/B-AROL-O), all rights reserved.
+Copyright (C) 2025, [B-AROL-O Team](https://github.com/B-AROL-O), all rights reserved.
 
 ### Source code license
 
