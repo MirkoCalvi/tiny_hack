@@ -1,5 +1,5 @@
 {
-    "name": "Z-Ant Development Container",
+    "name": "BeezzaAnts Development Container",
     "build": {
         "dockerfile": "Dockerfile",
         "context": ".."
