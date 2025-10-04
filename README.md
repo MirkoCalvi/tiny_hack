@@ -78,6 +78,8 @@ As you build your solution, here are some aspects worth considering:
 - **Zant Tool:** Model deployment to hardware
 - **Arduino Nicla Vision:** Edge AI hardware platform
 
+See the [`docs/`](./docs) folder for tutorials, troubleshooting, and additional resources 
+
 ---  
 
 Good luck, and remember: **creativity counts!** 🎉
