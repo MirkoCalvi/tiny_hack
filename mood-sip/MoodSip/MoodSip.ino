@@ -22,6 +22,7 @@ extern "C" __attribute__((used)) const uint8_t *flash_weights_base =
 
 #include "src/StateMachine.h"
 #include <Arduino.h>
+#include <Arduino_LSM6DSOX.h>
 #include <lib_zant.h> // int predict(float*, uint32_t*, uint32_t, float**)
 
 static QSPI_HandleTypeDef hqspi;
@@ -248,7 +249,6 @@ void setup() {
 }
 
 void loop() {
-
   // Perform inference
   float *out = nullptr;
   Serial.print("[Predict] Calling predict() [");
