@@ -303,17 +303,25 @@ rw-r--r-- 0/0 2481672 Jan  1 00:00 1970 /workspaces/Z-Ant/.zig-cache/o/b860c1ea0
 ```
 -->
 
-### 2. Build the static library of model "beer" with Zig
+### 1bis. Build and test natively
 
-<!-- (2025-10-04 18:55 CEST) -->
-
-TODO
+Commands:
 
 ```bash
-TODO
+zig build lib-gen -Dmodel="beer" -Ddo_export -Denable_user_tests -Dfuse
+zig build lib-test -Dmodel="beer" -Ddo_export -Denable_user_tests -Dfuse
+zig build lib -Dmodel="beer"
+zig build build-main -Dmodel="beer"
+zig-out/bin/main_profiling_target
 ```
 
+Result: TODO
+
+### 2. Build the static library of model "beer" for Nicla Vision
+
 #### Run `zig build lib-gen`
+
+<!-- (2025-10-04 20:32 CEST) -->
 
 Command:
 
@@ -325,8 +333,6 @@ zig build lib-gen \
   -Ddo_export \
   -Denable_user_tests
 ```
-
-<!-- (2025-10-04 17:45 CEST) -->
 
 Result:
 
@@ -531,6 +537,8 @@ Generated test file: generated/beer/test_beer.zig
 
 #### Run `zig build lib-test`
 
+<!-- (2025-10-04 20:33 CEST) -->
+
 ```bash
 zig build lib-test \
   -Dmodel="beer" \
@@ -539,8 +547,6 @@ zig build lib-test \
   -Ddo_export \
   -Denable_user_tests
 ```
-
-<!-- (2025-10-04 18:58 CEST) -->
 
 Result:
 
@@ -572,24 +578,30 @@ User tests loaded.
 (BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
-#### Run `zig build lib`
+#### Run `zig build lib` for Nicla Vision target
+
+<!-- (2025-10-04 20:34 CEST) -->
 
 ```bash
 zig build lib \
   -Dmodel="beer" \
+  -Doptimize=ReleaseSmall \
+  -Dtarget="thumb-freestanding" \
+  -Dcpu=cortex_m7 \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
   -Denable_user_tests
 ```
-
-<!-- (2025-10-04 18:58 CEST) -->
 
 Result:
 
 ```text
 (BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ zig build lib \
   -Dmodel="beer" \
+  -Doptimize=ReleaseSmall \
+  -Dtarget="thumb-freestanding" \
+  -Dcpu=cortex_m7 \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
@@ -597,29 +609,39 @@ Result:
 (BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
-Inspect generated code:
+Inspect the generated code:
+
+```bash
+ls -la generated/beer/
+```
+
+Result:
 
 ```text
 (BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ ls -la generated/beer/
 total 612
 drwxr-xr-x 2 vscode vscode   4096 Oct  4 16:02 .
 drwxr-xr-x 4 vscode vscode   4096 Oct  4 16:02 ..
--rw-r--r-- 1 vscode vscode 145536 Oct  4 16:55 lib_beer.zig
--rw-r--r-- 1 vscode vscode    408 Oct  4 16:55 model_options.zig
--rw-r--r-- 1 vscode vscode 198516 Oct  4 16:55 static_parameters.zig
--rw-r--r-- 1 vscode vscode  12116 Oct  4 16:55 test_beer.zig
--rw-r--r-- 1 vscode vscode 253848 Oct  4 16:55 user_tests.json
+-rw-r--r-- 1 vscode vscode 145536 Oct  4 18:32 lib_beer.zig
+-rw-r--r-- 1 vscode vscode    408 Oct  4 18:32 model_options.zig
+-rw-r--r-- 1 vscode vscode 198516 Oct  4 18:32 static_parameters.zig
+-rw-r--r-- 1 vscode vscode  12116 Oct  4 18:32 test_beer.zig
+-rw-r--r-- 1 vscode vscode 253848 Oct  4 18:32 user_tests.json
 (BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
 This should also generate a `libzant.a` (or similar) under your Zig build output.
 
+```bash
+ls -la zig-out/beer/
+```
+
 ```text
 (BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ ls -la zig-out/beer/
-total 3640
-drwxr-xr-x 2 vscode vscode    4096 Oct  4 16:58 .
-drwxr-xr-x 4 vscode vscode    4096 Oct  4 16:58 ..
--rw-r--r-- 1 vscode vscode 3716476 Oct  4 16:58 libzant.a
+total 116
+drwxr-xr-x 2 vscode vscode   4096 Oct  4 18:34 .
+drwxr-xr-x 5 vscode vscode   4096 Oct  4 18:19 ..
+-rw-r--r-- 1 vscode vscode 110408 Oct  4 18:34 libzant.a
 (BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
@@ -632,42 +654,40 @@ nm zig-out/beer/libzant.a
 Sample output:
 
 ```text
-(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ nm zig-out/beer/libzant.a
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ nm zig-out/beer/libzant.a | head
 
-/workspaces/BeezzaAnts/external/Z-Ant/.zig-cache/o/3a3d805baf815b5283c58bf35436102b/libzant.a.o:
-                 U abort
-0000000000006505 r __anon_10015
-00000000000005b5 r __anon_10603
-00000000000005e0 r __anon_10625
-00000000000005f2 r __anon_11122
-00000000000005f7 r __anon_11125
-0000000000006b40 r __anon_13504
-0000000000006e60 r __anon_14587
+/workspaces/BeezzaAnts/external/Z-Ant/.zig-cache/o/86f58d4560e1eeb9ade36ae50bb9598f/libzant.a.o:
+0000001c t $d
+000000bc t $d
+00000180 t $d
+000010ac t $d
+0000228c t $d
+00002710 t $d
+00002a74 t $d
+00002ab8 t $d
 ...
-000000000001a902 r posix.use_libc
-0000000000020350 t posix.write
-                 U pread64
-00000000000be4b0 T predict
-000000000001aedd r process.Child.native_os
-000000000001aee0 r process.Child.ResourceUsageStatistics.rusage_init
-0000000000020cc0 t process.hasNonEmptyEnvVarConstant__anon_5645
+00007b41 t OUTLINED_FUNCTION_99
+00001cad T predict
+         U realloc
+         U roundf
+00000b20 r static_parameters.allocator
+00000000 r static_parameters.array_const_fold_opt__159_quantized
+00000090 r static_parameters.array_const_fold_opt__159_scale
 ...
-000000000005c020 t __zig_is_named_enum_value_@typeInfo(debug.Dwarf.EntryHeader__union_4181).@"union".tag_type.?
-0000000000088be0 t __zig_is_named_enum_value_@typeInfo(debug.Dwarf.expression.StackMachine(.{ .addr_size = 8, .endian = .little, .call_frame_context = true }).Operand).@"union".tag_type.?
-0000000000063a70 t __zig_is_named_enum_value_@typeInfo(debug.Dwarf.expression.StackMachine(.{ .addr_size = 8, .endian = .little, .call_frame_context = true }).Value).@"union".tag_type.?
-00000000000164d0 t __zig_is_named_enum_value_@typeInfo(debug.Dwarf.FormValue).@"union".tag_type.?
-000000000004f8e0 t __zig_is_named_enum_value_@typeInfo(debug.SelfInfo.VirtualMachine.RegisterRule).@"union".tag_type.?
-0000000000021e00 t __zig_lt_errors_len
-                 U __zig_probe_stack
-000000000005c050 t __zig_tag_name_@typeInfo(debug.Dwarf.EntryHeader__union_4181).@"union".tag_type.?
-0000000000088c10 t __zig_tag_name_@typeInfo(debug.Dwarf.expression.StackMachine(.{ .addr_size = 8, .endian = .little, .call_frame_context = true }).Operand).@"union".tag_type.?
-0000000000063aa0 t __zig_tag_name_@typeInfo(debug.Dwarf.expression.StackMachine(.{ .addr_size = 8, .endian = .little, .call_frame_context = true }).Value).@"union".tag_type.?
+00000ad8 r static_parameters.tensor_model_1_logits_biasadd_model_1_logits_conv2d_logits_bias1_scale
+00000af0 r static_parameters.tensor_model_1_logits_biasadd_model_1_logits_conv2d_logits_bias1_zero_point
+00000b08 r static_parameters.tensor_model_1_logits_biasadd_model_1_logits_conv2d_logits_bias_quantized
+00000a78 r static_parameters.tensor_relu__37_0_scale
+00000850 r static_parameters.tensor_relu6__30_0_scale
+000009d0 r static_parameters.tensor_relu6__35_0_scale
+000000d0 r static_parameters.tensor_relu6__5_0_scale
+00000001 T zant_free_result
 (BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
 ### 3. Package as an Arduino library
 
-<!-- (2025-10-04 19:11 CEST) -->
+<!-- (2025-10-04 20:37 CEST) -->
 
 Create an Arduino library folder layout under your Arduino `libraries/` directory:
 
@@ -730,7 +750,7 @@ tree $HOME/Arduino/libraries/ZantLib
 
 Actual result:
 
-<!-- (2025-10-04 19:13 CEST) -->
+<!-- (2025-10-04 20:39 CEST) -->
 
 ```text
 (BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ tree $HOME/Arduino/libraries/ZantLib
@@ -761,11 +781,9 @@ You can find an example at `examples/tiny_hack/ZantLib/src/lib_zant.h`.
 
 ### 4. Arduino sketch: enable QSPI XPI and call `predict`
 
-<!-- (2025-10-04 19:15 CEST) -->
-
 See example in <https://github.com/ZantFoundation/Z-Ant/blob/main/examples/tiny_hack/tiny_hack.ino>
 
-### TODO 5. Custom linker: map `.flash_weights` to QSPI
+### 5. Custom linker: map `.flash_weights` to QSPI
 
 See example in <https://github.com/ZantFoundation/Z-Ant/blob/main/examples/tiny_hack/custom.ld>
 
@@ -832,7 +850,7 @@ arduino-cli compile \
   --build-property "compiler.c.elf.extra_flags=-Wl,-T$PWD/custom.ld"
 ```
 
-<!-- (2025-10-04 19:27 CEST) -->
+<!-- (2025-10-04 20:40 CEST) -->
 
 Result:
 
@@ -845,15 +863,8 @@ Result:
 Library Zant has been declared precompiled:
 Precompiled library in "/home/vscode/Arduino/libraries/ZantLib/src/cortex-m7/fpv5-d16-softfp" not found
 Using precompiled library in /home/vscode/Arduino/libraries/ZantLib/src/cortex-m7
-/home/vscode/Arduino/libraries/ZantLib/src/cortex-m7/libzant.a: error adding symbols: File format not recognized
-collect2: error: ld returned 1 exit status
-
-Used library Version Path
-Zant         1.0.0   /home/vscode/Arduino/libraries/ZantLib
-
-Used platform      Version Path
-arduino:mbed_nicla 4.4.1   /home/vscode/.arduino15/packages/arduino/hardware/mbed_nicla/4.4.1
-Error during build: exit status 1
+Sketch uses 153088 bytes (7%) of program storage space. Maximum is 1966080 bytes.
+Global variables use 50536 bytes (9%) of dynamic memory, leaving 473088 bytes for local variables. Maximum is 523624 bytes.
 (BeezzaAnts) vscode ➜ .../external/Z-Ant/examples/tiny_hack (gmacario/dev) $
 ```
 
