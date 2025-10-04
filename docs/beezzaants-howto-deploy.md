@@ -208,8 +208,7 @@ Additional commands you can run:
 vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
-<!-- (2025-10-03 15:13 CEST) -->
-
+<!--
 Verify the Zig source code which has been generated:
 
 ```text
@@ -246,12 +245,21 @@ drwxr-xr-x 3 vscode vscode    4096 Oct  3 13:05 ..
 rw-r--r-- 0/0 2481672 Jan  1 00:00 1970 /workspaces/Z-Ant/.zig-cache/o/b860c1ea062ab417c4cf633b4dd1e351/libzant.a.o
 (Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
 ```
+-->
 
 ### 2. Build the static library with Zig
 
+<!-- (2025-10-04 17:42 CEST) -->
+
+TODO
+
+```bash
+TODO
+```
+
 #### Run `zig build lib-gen`
 
-<!-- (2025-10-02 15:09 CEST) -->
+<!-- (2025-10-04 17:45 CEST) -->
 
 Command:
 
