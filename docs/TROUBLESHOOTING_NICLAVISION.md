@@ -33,4 +33,16 @@ You need to update the WiFi firmware and certificates on the Nicla Vision.
 
 ---
 
-If you still face issues after updating, make sure you are running the latest **Arduino Mbed OS Nicla Boards package** from the **Boards Manager**.
+## 🛠️ Issue: Uploading/Flashing Error on Linux
+**Error message:**
+```text
+Failed uploading: uploading error: exit status 1
+```
+
+### ✅ Root Cause
+On Linux systems, this error usually occurs because the correct udev rules for Arduino boards are missing or not properly installed.
+
+### 🔧 Solution
+Follow the official Arduino guide to fix udev rules on Linux: [Fix udev rules on Linux (Arduino Support)](https://support.arduino.cc/hc/en-us/articles/9005041052444-Fix-udev-rules-on-Linux#mbed-os).
+
+---
