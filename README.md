@@ -2,6 +2,8 @@
 
 An open-source swarm of buzzing bots and crawling code, powered by pizza, [FocoosAI](https://focoos.ai/), [Z-Ant](https://zantfoundation.github.io/Website/), and [Arduinos](https://www.arduino.cc/).
 
+Please read [README_upstream.md](README_upstream.md) for the Hackathon rules.
+
 ## Copyright and license
 
 Copyright (C) 2025, [B-AROL-O Team](https://github.com/B-AROL-O), all rights reserved.
