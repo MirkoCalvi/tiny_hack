@@ -1,6 +1,6 @@
-# Testing Z-Ant on labai-ubnt02
+# HOWTO Deploy BeezzaAnts on Nicla Vision
 
-<!-- (2025-10-02 13:20 CEST) -->
+<!-- (2025-10-04 17:28 CEST) -->
 
 ## Reference Documents
 
@@ -11,7 +11,7 @@
  
 ## Step-by-step instructions
 
-<!-- (2025-10-03 15:00 CEST) -->
+<!-- (2025-10-04 17:29 CEST) -->
 
 1. Launch Visual Studio Code
 
@@ -22,7 +22,7 @@
 3. VS Code Command Palette: Git: Clone
 
    - Repository: Clone from GitHub
-   - Repository Name: `B-AROL-O/Z-Ant`
+   - Repository Name: `B-AROL-O/BeezzaAnts`
 
 4. When asked for "Would you like to open the cloned repository?" click **Open**.
 
@@ -34,45 +34,13 @@
 
 8. VS Code: Terminal > New Terminal
 
-<!--
-**NOTE**: The default shell for user `vscode` is `/bin/sh`:
+### Make sure that submodules are checked out
 
-```text
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ grep vscode /etc/passwd
-vscode:x:1004:1004::/home/vscode:/bin/sh
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$
-```
-
-**TODO**: Configure `.devcontainer/Dockerfile` to set default shell for user `vscode` to `bash`.
-
-Fixed with <https://github.com/B-AROL-O/Z-Ant/commit/3fd630faa4a202dddb6d9888df01390c517a8361>
-
-**WORKAROUND**: From the Terminal drop-down menu, select `bash`.
--->
-
-<!--
-**TODO**: Configure `.devcontainer/devcontainer.json` to install the following recommended extensions:
-
-- [Container Tools](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-containers)
-
-Fixed with <https://github.com/B-AROL-O/Z-Ant/commit/c6eab12a4fadcc0395b635c5831d2213c6e60bbd>
--->
-
-<!--
-**TODO**: Install Arduino CLI:
+Logged in as `vscode@container`
 
 ```bash
-TODO
+git submodule update --init --recursive
 ```
--->
-
-<!--
-**TODO**: Install Arduino Nicla Vision DFU:
-
-```bash
-TODO
-```
--->
 
 ### Verify prerequisites
 
@@ -89,42 +57,24 @@ dfu-util --version
 # TODO ./zant
 ```
 
-<!--
-Result (with base image: ubuntu:22.04):
-
-```text
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ echo $SHELL
-/bin/sh
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ python --version
-Python 3.10.12
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ pip --version
-pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ zig version
-0.14.0
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$ uv --version
-uv 0.8.22
-vscode@4c9ffce46ec1:/workspaces/Z-Ant$
-```
--->
-
-<!-- 2025-10-03 15:03 CEST -->
+<!-- 2025-10-04 17:32 CEST -->
 
 Result:
 
 ```text
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ echo $SHELL
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ echo $SHELL
 /bin/bash
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ python --version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ python --version
 Python 3.10.12
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ pip --version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ pip --version
 pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ uv --version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ uv --version
 uv 0.8.22
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ zig version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ zig version
 0.14.0
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ arduino-cli version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ arduino-cli version
 arduino-cli  Version: 1.3.1 Commit: 08ff7e2b Date: 2025-08-28T13:51:45Z
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ dfu-util --version
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) $ dfu-util --version
 dfu-util 0.9
 
 Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
@@ -132,12 +82,14 @@ Copyright 2010-2016 Tormod Volden and Stefan Schmidt
 This program is Free Software and has ABSOLUTELY NO WARRANTY
 Please report bugs to http://sourceforge.net/p/dfu-util/tickets/
 
-vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+vscode ➜ /workspaces/BeezzaAnts (gmacario/dev) 
 ```
 
 ### Install Python dependencies
 
 ```bash
+sudo apt update && sudo apt -y install cmake
+# cd /workspaces/BeezzaAnts
 uv venv
 source .venv/bin/activate
 uv pip install onnx onnxruntime onnxsim
@@ -149,20 +101,82 @@ uv pip install onnx onnxruntime onnxsim
 
 **TODO**: Add to `.devcontainer/devcontainer.json`
 
-### Run `./zant create mnist-8`
-
-<!-- (2025-10-03 15:04 CEST) -->
-
-Command:
+### Change working directory
 
 ```bash
-uv run ./zant create mnist-8
+cd external/Z-Ant
 ```
+
+### Run `./zant input_setter`
+
+```bash
+./zant input_setter \
+  --model mnist-8 \
+  --shape 1,3,224,224
+```
+
+<!-- (2025-10-04 18:53 CEST) -->
 
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ uv run ./zant create mnist-8
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ ./zant input_setter \
+  --model mnist-8 \
+  --shape 1,3,224,224
+Executing: python3 src/onnx/input_setter.py --model mnist-8 --shape 1,3,224,224
+
+Processing: datasets/models/mnist-8/mnist-8.onnx
+Target shape: [1, 3, 224, 224]
+✅ Model loaded successfully
+Original model: 8 nodes, 7 initializers
+
+1. Fixing initializer validation issues...
+Creating dummy inputs for 7 initializers...
+Added 7 dummy inputs for initializers
+
+2. Setting input shape...
+Warning: Input 'data' not found. Available inputs:
+  - Input3
+  - Parameter87
+  - Parameter5
+  - Pooling160_Output_0_reshape0_shape
+  - Parameter194
+  - Parameter193_reshape1
+  - _v_23
+  - _v_24
+Using first input: Input3
+Updated input 'Input3' shape to: [1, 3, 224, 224]
+
+3. Running shape inference...
+✅ Shape inference successful
+
+4. Simplifying model...
+Attempting model simplification...
+✅ Standard simplification successful!
+
+5. Saving model to: datasets/models/mnist-8/mnist-8.onnx
+✅ Model saved successfully!
+
+Final model: 8 nodes, 7 initializers
+
+🎉 Model processing completed successfully!
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
+```
+
+### Run `./zant create mnist-8`
+
+Command:
+
+```bash
+./zant create mnist-8
+```
+
+<!-- (2025-10-04 18:54 CEST) -->
+
+Result:
+
+```text
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ ./zant create mnist-8
 ======================================
 Model Pipeline for: mnist-8
 Model path: datasets/models/mnist-8/mnist-8.onnx
@@ -221,13 +235,7 @@ Generated test file: generated/mnist-8/test_mnist-8.zig
 [SUCCESS] Library code generation completed
 [STEP] Testing generated library...
 lib-test
-└─ run test_generated_lib stderr
- ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++ testing mnist-8 ++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++
---- Random data Prediction Test ---
-Prediction done without errors
-
+└─ run test_generated_lib 5/6 passed, 1 failed
 --- Wrong Input Shape test ---
 
 --- Empty Input test ---
@@ -236,27 +244,27 @@ Prediction done without errors
 
 --- User data Prediction test ---
 User tests are disabled for this model
-[SUCCESS] Library tests completed
-[STEP] Building static library...
-[SUCCESS] Static library build completed
-
-======================================
-[SUCCESS] Pipeline completed successfully!
-======================================
-Model: mnist-8
-Generated files should be in: generated/mnist-8/
-Static library should be in: zig-out/mnist-8/
-
-Additional commands you can run:
-  zig build lib-exe -Dmodel=mnist-8    # Run the generated model executable
-  zig build benchmark -Dmodel=mnist-8  # Run performance benchmarks
-  zig build test -Dmodel=mnist-8       # Run unit tests
-======================================
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+error: 'test_mnist-8.test.Static Library - Random data Prediction Test' failed:  ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++ testing mnist-8 ++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--- Random data Prediction Test ---expected 0, found -1
+/opt/zig/lib/std/testing.zig:103:17: 0x10e406c in expectEqualInner__anon_19082 (test_generated_lib)
+                return error.TestExpectedEqual;
+                ^
+/workspaces/BeezzaAnts/external/Z-Ant/generated/mnist-8/test_mnist-8.zig:126:5: 0x10e4552 in test.Static Library - Random data Prediction Test (test_generated_lib)
+    try std.testing.expectEqual(0, return_code);
+    ^
+error: while executing test 'test_mnist-8.test.Static Library - User data Prediction Test', the following test command failed:
+/workspaces/BeezzaAnts/external/Z-Ant/.zig-cache/o/82ae57f721908fbeff2d5cc7fac20a27/test_generated_lib --seed=0x9a8188a6 --cache-dir=/workspaces/BeezzaAnts/external/Z-Ant/.zig-cache --listen=- 
+Build Summary: 3/5 steps succeeded; 1 failed; 5/6 tests passed; 1 failed
+lib-test transitive failure
+└─ run test_generated_lib 5/6 passed, 1 failed
+error: the following build command failed with exit code 1:
+/workspaces/BeezzaAnts/external/Z-Ant/.zig-cache/o/7f05b28ce341a8b494228600978483eb/build /opt/zig/zig /opt/zig/lib /workspaces/BeezzaAnts/external/Z-Ant /workspaces/BeezzaAnts/external/Z-Ant/.zig-cache /home/vscode/.cache/zig --seed 0x9a8188a6 -Zefe428e8f8a3674e lib-test -Dmodel=mnist-8
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
-<!-- (2025-10-03 15:13 CEST) -->
-
+<!--
 Verify the Zig source code which has been generated:
 
 ```text
@@ -293,18 +301,33 @@ drwxr-xr-x 3 vscode vscode    4096 Oct  3 13:05 ..
 rw-r--r-- 0/0 2481672 Jan  1 00:00 1970 /workspaces/Z-Ant/.zig-cache/o/b860c1ea062ab417c4cf633b4dd1e351/libzant.a.o
 (Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
 ```
+-->
 
-### 2. Build the static library with Zig
+### 1bis. Build and test natively
+
+Commands:
+
+```bash
+zig build lib-gen -Dmodel="beer" -Ddo_export -Denable_user_tests -Dfuse
+zig build lib-test -Dmodel="beer" -Ddo_export -Denable_user_tests -Dfuse
+zig build lib -Dmodel="beer"
+zig build build-main -Dmodel="beer"
+zig-out/bin/main_profiling_target
+```
+
+Result: TODO
+
+### 2. Build the static library of model "beer" for Nicla Vision
 
 #### Run `zig build lib-gen`
 
-<!-- (2025-10-02 15:09 CEST) -->
+<!-- (2025-10-04 20:32 CEST) -->
 
 Command:
 
 ```bash
 zig build lib-gen \
-  -Dmodel="mnist-8" \
+  -Dmodel="beer" \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
@@ -314,8 +337,8 @@ zig build lib-gen \
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ zig build lib-gen \
-  -Dmodel="mnist-8" \
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ zig build lib-gen \
+  -Dmodel="beer" \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
@@ -323,9 +346,9 @@ Result:
 
 
 codegenOptions: 
-     model:mnist-8 
-     model_path:datasets/models/mnist-8/mnist-8.onnx 
-     generated_path:generated/mnist-8/ 
+     model:beer 
+     model_path:datasets/models/beer/beer.onnx 
+     generated_path:generated/beer/ 
      user_tests:true 
      log:false 
      shape: 
@@ -333,42 +356,192 @@ codegenOptions:
      output_type:f32 
      comm:false 
      dynamic:true 
-     version:v1 info: 
- .......... file created, path:generated/mnist-8/static_parameters.zig
+     version:v1 
+
+ --- Linearized Graph post fusion : 
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D__40 
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D__40_0_QuantizeLinear 
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D_quant 
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D_DequantizeLinear 
+  Relu6__5 
+  Relu6__5_0_QuantizeLinear 
+  model_1/expanded_conv_depthwise_relu/Relu6;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D_quant 
+  model_1/expanded_conv_depthwise_relu/Relu6;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D_DequantizeLinear 
+  Relu6__7 
+  Relu6__7_0_QuantizeLinear 
+  model_1/expanded_conv_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/expanded_conv_project/Conv2D1_quant 
+  model_1/block_1_expand_relu/Relu6;model_1/block_1_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_expand/Conv2D_quant 
+  model_1/block_1_expand_relu/Relu6;model_1/block_1_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_expand/Conv2D_DequantizeLinear 
+  Relu6__10 
+  Relu6__10_0_QuantizeLinear 
+  model_1/block_1_depthwise_relu/Relu6;model_1/block_1_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_depthwise/depthwise_quant 
+  model_1/block_1_depthwise_relu/Relu6;model_1/block_1_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_depthwise/depthwise_DequantizeLinear 
+  Relu6__12 
+  Relu6__12_0_QuantizeLinear 
+  model_1/block_1_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/block_1_project/Conv2D1_quant 
+  model_1/block_1_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/block_1_project/Conv2D1_DequantizeLinear 
+  model_1/block_2_expand_relu/Relu6;model_1/block_2_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_expand/Conv2D_quant 
+  model_1/block_2_expand_relu/Relu6;model_1/block_2_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_expand/Conv2D_DequantizeLinear 
+  Relu6__15 
+  Relu6__15_0_QuantizeLinear 
+  model_1/block_2_depthwise_relu/Relu6;model_1/block_2_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_depthwise/depthwise_quant 
+  model_1/block_2_depthwise_relu/Relu6;model_1/block_2_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_depthwise/depthwise_DequantizeLinear 
+  Relu6__17 
+  Relu6__17_0_QuantizeLinear 
+  model_1/block_2_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D1_quant 
+  model_1/block_2_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D1_DequantizeLinear 
+  model_1/block_2_add/add 
+  model_1/block_2_add/add_QuantizeLinear 
+  model_1/block_3_expand_relu/Relu6;model_1/block_3_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_3_expand/Conv2D_quant 
+  model_1/block_3_expand_relu/Relu6;model_1/block_3_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_3_expand/Conv2D_DequantizeLinear 
+  Relu6__20 
+  Relu6__20_0_QuantizeLinear 
+  model_1/block_3_depthwise_relu/Relu6;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise_quant 
+  model_1/block_3_depthwise_relu/Relu6;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise_DequantizeLinear 
+  Relu6__22 
+  Relu6__22_0_QuantizeLinear 
+  model_1/block_3_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_3_project/Conv2D1_quant 
+  model_1/block_3_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_3_project/Conv2D1_DequantizeLinear 
+  model_1/block_4_expand_relu/Relu6;model_1/block_4_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_expand/Conv2D_quant 
+  model_1/block_4_expand_relu/Relu6;model_1/block_4_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_expand/Conv2D_DequantizeLinear 
+  Relu6__25 
+  Relu6__25_0_QuantizeLinear 
+  model_1/block_4_depthwise_relu/Relu6;model_1/block_4_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_depthwise/depthwise_quant 
+  model_1/block_4_depthwise_relu/Relu6;model_1/block_4_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_depthwise/depthwise_DequantizeLinear 
+  Relu6__27 
+  Relu6__27_0_QuantizeLinear 
+  model_1/block_4_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_4_project/Conv2D1_quant 
+  model_1/block_4_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_4_project/Conv2D1_DequantizeLinear 
+  model_1/block_4_add/add 
+  model_1/block_4_add/add_QuantizeLinear 
+  model_1/block_5_expand_relu/Relu6;model_1/block_5_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_5_expand/Conv2D_quant 
+  model_1/block_5_expand_relu/Relu6;model_1/block_5_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_5_expand/Conv2D_DequantizeLinear 
+  Relu6__30 
+  Relu6__30_0_QuantizeLinear 
+  model_1/block_5_depthwise_relu/Relu6;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_quant 
+  model_1/block_5_depthwise_relu/Relu6;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_DequantizeLinear 
+  Relu6__32 
+  Relu6__32_0_QuantizeLinear 
+  model_1/block_5_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D1_quant 
+  model_1/block_5_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D1_DequantizeLinear 
+  model_1/block_5_add/add 
+  model_1/block_5_add/add_QuantizeLinear 
+  model_1/block_6_expand_relu/Relu6;model_1/block_6_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_quant 
+  model_1/block_6_expand_relu/Relu6;model_1/block_6_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_DequantizeLinear 
+  Relu6__35 
+  Relu6__35_0_QuantizeLinear 
+  model_1/head/Relu;model_1/head/BiasAdd;model_1/head/Conv2D;head/bias_quant 
+  model_1/head/Relu;model_1/head/BiasAdd;model_1/head/Conv2D;head/bias_DequantizeLinear 
+  Relu__37 
+  Relu__37_0_QuantizeLinear 
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1_quant 
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1_DequantizeLinear 
+  StatefulPartitionedCall:0 
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1__142 
+
+ Pre-Fusion nodes: 79 
+ Post-Fusion nodes: 79
 info: 
- .......... file created, path:generated/mnist-8/lib_mnist-8.zig
+ .......... file created, path:generated/beer/static_parameters.zig
 info: 
+ .......... file created, path:generated/beer/lib_beer.zig
+info: Attempting to build ExecutionPlan with 79 nodes...
+info: ExecutionPlan built successfully with 79 steps!
 
-Generated test file: generated/mnist-8/test_mnist-8.zig
 
+graph.deinit() ------------- 
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D__40.deinit()  
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D__40_0_QuantizeLinear.deinit()  
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D_quant.deinit()  
+  model_1/Conv1_relu/Relu6;model_1/bn_Conv1/FusedBatchNormV3;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D;model_1/Conv1/Conv2D_DequantizeLinear.deinit()  
+  Relu6__5.deinit()  
+  Relu6__5_0_QuantizeLinear.deinit()  
+  model_1/expanded_conv_depthwise_relu/Relu6;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D_quant.deinit()  
+  model_1/expanded_conv_depthwise_relu/Relu6;model_1/expanded_conv_depthwise_BN/FusedBatchNormV3;model_1/expanded_conv_depthwise/depthwise;model_1/block_5_project/Conv2D_DequantizeLinear.deinit()  
+  Relu6__7.deinit()  
+  Relu6__7_0_QuantizeLinear.deinit()  
+  model_1/expanded_conv_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/expanded_conv_project/Conv2D1_quant.deinit()  
+  model_1/block_1_expand_relu/Relu6;model_1/block_1_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_expand/Conv2D_quant.deinit()  
+  model_1/block_1_expand_relu/Relu6;model_1/block_1_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__10.deinit()  
+  Relu6__10_0_QuantizeLinear.deinit()  
+  model_1/block_1_depthwise_relu/Relu6;model_1/block_1_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_depthwise/depthwise_quant.deinit()  
+  model_1/block_1_depthwise_relu/Relu6;model_1/block_1_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_1_depthwise/depthwise_DequantizeLinear.deinit()  
+  Relu6__12.deinit()  
+  Relu6__12_0_QuantizeLinear.deinit()  
+  model_1/block_1_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/block_1_project/Conv2D1_quant.deinit()  
+  model_1/block_2_expand_relu/Relu6;model_1/block_2_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_expand/Conv2D_quant.deinit()  
+  model_1/block_1_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D;model_1/block_1_project/Conv2D1_DequantizeLinear.deinit()  
+  model_1/block_2_expand_relu/Relu6;model_1/block_2_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__15.deinit()  
+  Relu6__15_0_QuantizeLinear.deinit()  
+  model_1/block_2_depthwise_relu/Relu6;model_1/block_2_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_depthwise/depthwise_quant.deinit()  
+  model_1/block_2_depthwise_relu/Relu6;model_1/block_2_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_2_depthwise/depthwise_DequantizeLinear.deinit()  
+  Relu6__17.deinit()  
+  Relu6__17_0_QuantizeLinear.deinit()  
+  model_1/block_2_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D1_quant.deinit()  
+  model_1/block_2_project_BN/FusedBatchNormV3;model_1/block_2_project/Conv2D1_DequantizeLinear.deinit()  
+  model_1/block_2_add/add.deinit()  
+  model_1/block_2_add/add_QuantizeLinear.deinit()  
+  model_1/block_3_expand_relu/Relu6;model_1/block_3_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_3_expand/Conv2D_quant.deinit()  
+  model_1/block_3_expand_relu/Relu6;model_1/block_3_expand_BN/FusedBatchNormV3;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise;model_1/block_3_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__20.deinit()  
+  Relu6__20_0_QuantizeLinear.deinit()  
+  model_1/block_3_depthwise_relu/Relu6;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise_quant.deinit()  
+  model_1/block_3_depthwise_relu/Relu6;model_1/block_3_depthwise_BN/FusedBatchNormV3;model_1/block_3_depthwise/depthwise_DequantizeLinear.deinit()  
+  Relu6__22.deinit()  
+  Relu6__22_0_QuantizeLinear.deinit()  
+  model_1/block_3_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_3_project/Conv2D1_quant.deinit()  
+  model_1/block_4_expand_relu/Relu6;model_1/block_4_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_expand/Conv2D_quant.deinit()  
+  model_1/block_3_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_3_project/Conv2D1_DequantizeLinear.deinit()  
+  model_1/block_4_expand_relu/Relu6;model_1/block_4_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__25.deinit()  
+  Relu6__25_0_QuantizeLinear.deinit()  
+  model_1/block_4_depthwise_relu/Relu6;model_1/block_4_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_depthwise/depthwise_quant.deinit()  
+  model_1/block_4_depthwise_relu/Relu6;model_1/block_4_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_4_depthwise/depthwise_DequantizeLinear.deinit()  
+  Relu6__27.deinit()  
+  Relu6__27_0_QuantizeLinear.deinit()  
+  model_1/block_4_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_4_project/Conv2D1_quant.deinit()  
+  model_1/block_4_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D;model_1/block_4_project/Conv2D1_DequantizeLinear.deinit()  
+  model_1/block_4_add/add.deinit()  
+  model_1/block_4_add/add_QuantizeLinear.deinit()  
+  model_1/block_5_expand_relu/Relu6;model_1/block_5_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_5_expand/Conv2D_quant.deinit()  
+  model_1/block_5_expand_relu/Relu6;model_1/block_5_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D;model_1/block_5_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__30.deinit()  
+  Relu6__30_0_QuantizeLinear.deinit()  
+  model_1/block_5_depthwise_relu/Relu6;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_quant.deinit()  
+  model_1/block_5_depthwise_relu/Relu6;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__32.deinit()  
+  Relu6__32_0_QuantizeLinear.deinit()  
+  model_1/block_5_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D1_quant.deinit()  
+  model_1/block_5_project_BN/FusedBatchNormV3;model_1/block_5_project/Conv2D1_DequantizeLinear.deinit()  
+  model_1/block_5_add/add.deinit()  
+  model_1/block_5_add/add_QuantizeLinear.deinit()  
+  model_1/block_6_expand_relu/Relu6;model_1/block_6_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_quant.deinit()  
+  model_1/block_6_expand_relu/Relu6;model_1/block_6_expand_BN/FusedBatchNormV3;model_1/block_5_depthwise_BN/FusedBatchNormV3;model_1/block_5_depthwise/depthwise;model_1/block_6_expand/Conv2D_DequantizeLinear.deinit()  
+  Relu6__35.deinit()  
+  Relu6__35_0_QuantizeLinear.deinit()  
+  model_1/head/Relu;model_1/head/BiasAdd;model_1/head/Conv2D;head/bias_quant.deinit()  
+  model_1/head/Relu;model_1/head/BiasAdd;model_1/head/Conv2D;head/bias_DequantizeLinear.deinit()  
+  Relu__37.deinit()  
+  Relu__37_0_QuantizeLinear.deinit()  
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1_quant.deinit()  
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1_DequantizeLinear.deinit()  
+  StatefulPartitionedCall:0.deinit()  
+  model_1/logits/BiasAdd;model_1/logits/Conv2D;logits/bias1__142.deinit()  info: 
 
-=========== ONNX Model Details ===========
-Model version: onnx.onnx.Version.IR_VERSION_2019_1_22
-Producer: CNTK
+Generated test file: generated/beer/test_beer.zig
 
-Graph Statistics:
-  Number of nodes: 8
-  Operator distribution:
-    Reshape: 1
-    Conv: 2
-    Gemm: 1
-    Relu: 2
-    MaxPool: 2
-
-Memory Requirements:
-  Total tensors: 9
-  Total weight size: 23992 bytes (0.02 MB)
-=========================================
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
 #### Run `zig build lib-test`
 
-<!-- (2025-10-02 15:09 CEST) -->
+<!-- (2025-10-04 20:33 CEST) -->
 
 ```bash
 zig build lib-test \
-  -Dmodel="mnist-8" \
+  -Dmodel="beer" \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
@@ -378,20 +551,19 @@ zig build lib-test \
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ zig build lib-test \
-  -Dmodel="mnist-8" \
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ zig build lib-test \
+  -Dmodel="beer" \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
   -Denable_user_tests
 lib-test
 └─ run test_generated_lib stderr
- ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++++++++++++++++++ testing mnist-8 ++++++++++++++++++
-++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ +++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++ testing beer ++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++
 --- Random data Prediction Test ---
-Prediction done without errors:
-
+Prediction done without errors
 
 --- Wrong Input Shape test ---
 
@@ -402,30 +574,20 @@ Prediction done without errors:
 --- User data Prediction test ---
 User tests loaded.
 
-        Running user test: mnist-8
-
- 
- expected output  ->  real value      difference  
- -4.1226494e-1 ->  -4.1226524e-1      2.9802322e-7  
- -9.490775e-3 ->  -9.490378e-3      3.9674342e-7  
- 6.233672e-1 ->  6.2336653e-1      6.556511e-7  
- 6.694817e-1 ->  6.6948164e-1      5.9604645e-8  
- -6.0755527e-1 ->  -6.0755515e-1      1.1920929e-7  
- 1.0273058e0 ->  1.0273058e0      0e0  
- -5.273663e-1 ->  -5.273664e-1      1.1920929e-7  
- -1.7929406e-1 ->  -1.7929403e-1      2.9802322e-8  
- -3.159709e-1 ->  -3.159712e-1      2.9802322e-7  
- -8.7684447e-1 ->  -8.7684494e-1      4.7683716e-7 
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+        Running user test: beer
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
-#### Run `zig build lib`
+#### Run `zig build lib` for Nicla Vision target
 
-<!-- (2025-10-02 15:10 CEST) -->
+<!-- (2025-10-04 20:34 CEST) -->
 
 ```bash
 zig build lib \
-  -Dmodel="mnist-8" \
+  -Dmodel="beer" \
+  -Doptimize=ReleaseSmall \
+  -Dtarget="thumb-freestanding" \
+  -Dcpu=cortex_m7 \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
@@ -435,22 +597,97 @@ zig build lib \
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ zig build lib \
-  -Dmodel="mnist-8" \
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ zig build lib \
+  -Dmodel="beer" \
+  -Doptimize=ReleaseSmall \
+  -Dtarget="thumb-freestanding" \
+  -Dcpu=cortex_m7 \
   -Dxip=true \
   -Ddynamic \
   -Ddo_export \
   -Denable_user_tests
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
-This should generate a `libzant.a` (or similar) under your Zig build output.
+Inspect the generated code:
 
-TODO
+```bash
+ls -la generated/beer/
+```
+
+Result:
+
+```text
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ ls -la generated/beer/
+total 612
+drwxr-xr-x 2 vscode vscode   4096 Oct  4 16:02 .
+drwxr-xr-x 4 vscode vscode   4096 Oct  4 16:02 ..
+-rw-r--r-- 1 vscode vscode 145536 Oct  4 18:32 lib_beer.zig
+-rw-r--r-- 1 vscode vscode    408 Oct  4 18:32 model_options.zig
+-rw-r--r-- 1 vscode vscode 198516 Oct  4 18:32 static_parameters.zig
+-rw-r--r-- 1 vscode vscode  12116 Oct  4 18:32 test_beer.zig
+-rw-r--r-- 1 vscode vscode 253848 Oct  4 18:32 user_tests.json
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
+```
+
+This should also generate a `libzant.a` (or similar) under your Zig build output.
+
+```bash
+ls -la zig-out/beer/
+```
+
+```text
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ ls -la zig-out/beer/
+total 116
+drwxr-xr-x 2 vscode vscode   4096 Oct  4 18:34 .
+drwxr-xr-x 5 vscode vscode   4096 Oct  4 18:19 ..
+-rw-r--r-- 1 vscode vscode 110408 Oct  4 18:34 libzant.a
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
+```
+
+Inspect the library with the following command
+
+```bash
+nm zig-out/beer/libzant.a
+```
+
+Sample output:
+
+```text
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ nm zig-out/beer/libzant.a | head
+
+/workspaces/BeezzaAnts/external/Z-Ant/.zig-cache/o/86f58d4560e1eeb9ade36ae50bb9598f/libzant.a.o:
+0000001c t $d
+000000bc t $d
+00000180 t $d
+000010ac t $d
+0000228c t $d
+00002710 t $d
+00002a74 t $d
+00002ab8 t $d
+...
+00007b41 t OUTLINED_FUNCTION_99
+00001cad T predict
+         U realloc
+         U roundf
+00000b20 r static_parameters.allocator
+00000000 r static_parameters.array_const_fold_opt__159_quantized
+00000090 r static_parameters.array_const_fold_opt__159_scale
+...
+00000ad8 r static_parameters.tensor_model_1_logits_biasadd_model_1_logits_conv2d_logits_bias1_scale
+00000af0 r static_parameters.tensor_model_1_logits_biasadd_model_1_logits_conv2d_logits_bias1_zero_point
+00000b08 r static_parameters.tensor_model_1_logits_biasadd_model_1_logits_conv2d_logits_bias_quantized
+00000a78 r static_parameters.tensor_relu__37_0_scale
+00000850 r static_parameters.tensor_relu6__30_0_scale
+000009d0 r static_parameters.tensor_relu6__35_0_scale
+000000d0 r static_parameters.tensor_relu6__5_0_scale
+00000001 T zant_free_result
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
+```
 
 ### 3. Package as an Arduino library
 
-<!-- (2025-10-03 15:30 CEST) -->
+<!-- (2025-10-04 20:37 CEST) -->
 
 Create an Arduino library folder layout under your Arduino `libraries/` directory:
 
@@ -462,7 +699,7 @@ mkdir -p $HOME/Arduino/libraries/ZantLib/src/cortex-m7
 Copy the produced `.a` into `src/cortex-m7/`:
 
 ```bash
-cp zig-out/mnist-8/libzant.a \
+cp zig-out/beer/libzant.a \
     $HOME/Arduino/libraries/ZantLib/src/cortex-m7
 ```
 
@@ -496,11 +733,37 @@ cp -av \
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ cp -av examples/tiny_hack/ZantLib $HOME/Arduino/libraries/
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ cp -av \
+    examples/tiny_hack/ZantLib \
+    $HOME/Arduino/libraries/
 'examples/tiny_hack/ZantLib/library.properties' -> '/home/vscode/Arduino/libraries/ZantLib/library.properties'
 'examples/tiny_hack/ZantLib/src/cortex-m7/comments' -> '/home/vscode/Arduino/libraries/ZantLib/src/cortex-m7/comments'
 'examples/tiny_hack/ZantLib/src/lib_zant.h' -> '/home/vscode/Arduino/libraries/ZantLib/src/lib_zant.h'
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
+```
+
+Verify the structure of your Arduino library with the following command:
+
+```bash
+tree $HOME/Arduino/libraries/ZantLib
+```
+
+Actual result:
+
+<!-- (2025-10-04 20:39 CEST) -->
+
+```text
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ tree $HOME/Arduino/libraries/ZantLib
+/home/vscode/Arduino/libraries/ZantLib
+├── library.properties
+└── src
+    ├── cortex-m7
+    │   ├── comments
+    │   └── libzant.a
+    └── lib_zant.h
+
+2 directories, 4 files
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
 Your Arduino libraries directory should look like this:
@@ -513,109 +776,38 @@ $HOME/Arduino/libraries/ZantLib
                               |...lib_zant.a
 ```
 
-Actual result:
-
-```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ tree $HOME/Arduino/libraries/ZantLib
-/home/vscode/Arduino/libraries/ZantLib
-├── library.properties
-└── src
-    ├── cortex-m7
-    │   ├── comments
-    │   └── libzant.a
-    └── lib_zant.h
-
-2 directories, 4 files
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
-```
-
 **NOTE**: If your Arduino header is `lib_zant.h`, make sure it declares the prediction entry point (e.g. `int predict(float*, uint32_t*, uint32_t, float**);`).
 You can find an example at `examples/tiny_hack/ZantLib/src/lib_zant.h`.
 
-### TODO 4. Arduino sketch: enable QSPI XPI and call `predict`
+### 4. Arduino sketch: enable QSPI XPI and call `predict`
 
-TODO
+See example in <https://github.com/ZantFoundation/Z-Ant/blob/main/examples/tiny_hack/tiny_hack.ino>
 
-### TODO 5. Custom linker: map `.flash_weights` to QSPI
+### 5. Custom linker: map `.flash_weights` to QSPI
 
-TODO
+See example in <https://github.com/ZantFoundation/Z-Ant/blob/main/examples/tiny_hack/custom.ld>
 
 **IMPORTANT**: Your Zig build must emit into a section named `.flash_weights` (or adjust names consistently in both the codegen and this script).
 The Arduino sketch exports `flash_weights_base` at `0x90000000` for the Zig library to reference.
 So ensure that the flag **-Dxip** is set to true when codegenerating the library.
 
-### TODO: 6. Compile with Arduino CLI using the custom linker
-
-From the sketch folder containing `tiny_hack.ino` and `custom.ld`:
+### 5b. Make sure that the required Arduino core is installed
 
 ```bash
-cd examples/tiny_hack
-FQBN="arduino:mbed_nicla:nicla_vision"
-
-arduino-cli compile \
-  --fqbn "$FQBN" \
-  --export-binaries \
-  --libraries $HOME/Arduino/libraries \
-  --build-property "compiler.c.elf.extra_flags=-Wl,-T$PWD/custom.ld"
+arduino-cli core install arduino:mbed_nicla
 ```
-
-<!-- (2025-10-03 15:36 CEST) -->
 
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ cd examples/tiny_hack/
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $ FQBN="arduino:mbed_nicla:nicla_vision"
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $ arduino-cli compile \
-  --fqbn "$FQBN" \
-  --export-binaries \
-  --libraries $HOME/Arduino/libraries \
-  --build-property "compiler.c.elf.extra_flags=-Wl,-T$PWD/custom.ld"
-Downloading index: library_index.tar.bz2 downloaded                                                                   
-Downloading index: package_index.tar.bz2 downloaded
-Downloading missing tool builtin:ctags@5.8-arduino11...
-builtin:ctags@5.8-arduino11 downloaded
-Installing builtin:ctags@5.8-arduino11...
-Skipping tool configuration....
-builtin:ctags@5.8-arduino11 installed
-Downloading missing tool builtin:dfu-discovery@0.1.2...
-builtin:dfu-discovery@0.1.2 downloaded
-Installing builtin:dfu-discovery@0.1.2...
-Skipping tool configuration....
-builtin:dfu-discovery@0.1.2 installed
-Downloading missing tool builtin:mdns-discovery@1.0.9...
-builtin:mdns-discovery@1.0.9 downloaded
-Installing builtin:mdns-discovery@1.0.9...
-Skipping tool configuration....
-builtin:mdns-discovery@1.0.9 installed
-Downloading missing tool builtin:serial-discovery@1.4.1...
-builtin:serial-discovery@1.4.1 downloaded
-Installing builtin:serial-discovery@1.4.1...
-Skipping tool configuration....
-builtin:serial-discovery@1.4.1 installed
-Downloading missing tool builtin:serial-monitor@0.15.0...
-builtin:serial-monitor@0.15.0 downloaded
-Installing builtin:serial-monitor@0.15.0...
-Skipping tool configuration....
-builtin:serial-monitor@0.15.0 installed
-Error during build: Platform 'arduino:mbed_nicla' not found: platform not installed
-Try running `arduino-cli core install arduino:mbed_nicla`
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $
-```
-
-<!-- (2025-10-03 15:40 CEST) -->
-
-Apply the suggested fix:
-
-```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $ arduino-cli core install arduino:mbed_nicla
+(BeezzaAnts) vscode ➜ .../external/Z-Ant/examples/tiny_hack (gmacario/dev) $ arduino-cli core install arduino:mbed_nicla
 Downloading packages...
-arduino:arm-none-eabi-gcc@7-2017q4 downloaded
-arduino:bossac@1.9.1-arduino2 downloaded
-arduino:dfu-util@0.10.0-arduino1 downloaded
-arduino:openocd@0.11.0-arduino2 downloaded
-arduino:rp2040tools@1.0.6 downloaded
-arduino:mbed_nicla@4.4.1 downloaded
+arduino:arm-none-eabi-gcc@7-2017q4 downloaded                                                                                                                                                                                                                         
+arduino:bossac@1.9.1-arduino2 downloaded                                                                                                                                                                                                                              
+arduino:dfu-util@0.10.0-arduino1 downloaded                                                                                                                                                                                                                           
+arduino:openocd@0.11.0-arduino2 downloaded                                                                                                                                                                                                                            
+arduino:rp2040tools@1.0.6 downloaded                                                                                                                                                                                                                                  
+arduino:mbed_nicla@4.4.1 downloaded                                                                                                                                                                                                                                   
 Installing arduino:arm-none-eabi-gcc@7-2017q4...
 Configuring tool....
 arduino:arm-none-eabi-gcc@7-2017q4 installed
@@ -640,14 +832,17 @@ sudo "/home/vscode/.arduino15/packages/arduino/hardware/mbed_nicla/4.4.1/post_in
 
 
 Platform arduino:mbed_nicla@4.4.1 installed
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $
+(BeezzaAnts) vscode ➜ .../external/Z-Ant/examples/tiny_hack (gmacario/dev) $
 ```
 
-<!-- (2025-10-03 15:44 CEST) -->
+### 6. Compile with Arduino CLI using the custom linker
 
-then retry:
+From the sketch folder containing `tiny_hack.ino` and `custom.ld`:
 
 ```bash
+cd examples/tiny_hack
+FQBN="arduino:mbed_nicla:nicla_vision"
+
 arduino-cli compile \
   --fqbn "$FQBN" \
   --export-binaries \
@@ -655,9 +850,12 @@ arduino-cli compile \
   --build-property "compiler.c.elf.extra_flags=-Wl,-T$PWD/custom.ld"
 ```
 
+<!-- (2025-10-04 20:40 CEST) -->
+
 Result:
-```
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $ arduino-cli compile \
+
+```text
+(BeezzaAnts) vscode ➜ .../external/Z-Ant/examples/tiny_hack (gmacario/dev) $ arduino-cli compile \
   --fqbn "$FQBN" \
   --export-binaries \
   --libraries $HOME/Arduino/libraries \
@@ -665,16 +863,9 @@ Result:
 Library Zant has been declared precompiled:
 Precompiled library in "/home/vscode/Arduino/libraries/ZantLib/src/cortex-m7/fpv5-d16-softfp" not found
 Using precompiled library in /home/vscode/Arduino/libraries/ZantLib/src/cortex-m7
-/home/vscode/Arduino/libraries/ZantLib/src/cortex-m7/libzant.a: error adding symbols: File format not recognized
-collect2: error: ld returned 1 exit status
-
-Used library Version Path
-Zant         1.0.0   /home/vscode/Arduino/libraries/ZantLib
-
-Used platform      Version Path
-arduino:mbed_nicla 4.4.1   /home/vscode/.arduino15/packages/arduino/hardware/mbed_nicla/4.4.1
-Error during build: exit status 1
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $
+Sketch uses 153088 bytes (7%) of program storage space. Maximum is 1966080 bytes.
+Global variables use 50536 bytes (9%) of dynamic memory, leaving 473088 bytes for local variables. Maximum is 523624 bytes.
+(BeezzaAnts) vscode ➜ .../external/Z-Ant/examples/tiny_hack (gmacario/dev) $
 ```
 
 TODO TODO TODO

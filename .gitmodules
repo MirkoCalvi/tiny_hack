@@ -1,0 +1,6 @@
+[submodule "external/Z-Ant"]
+	path = external/Z-Ant
+	url = https://github.com/B-AROL-O/Z-Ant.git
+[submodule "external/focoos"]
+	path = external/focoos
+	url = https://github.com/B-AROL-O/focoos.git

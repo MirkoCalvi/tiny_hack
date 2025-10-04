@@ -1,51 +1,104 @@
-# 🐝🐜🍕 BeezzaAnts
+<div align="center">
+  <img src="img/loghi.png" alt="Alt text" width="900" >
+</div>
 
-**Smarter Pizza. Powered by Vision, Bugs, and Bots.**
+# The Challenge
 
-An open-source swarm of buzzing bots and crawling code, powered by pizza, [FocoosAI](https://focoos.ai/), [Z-Ant](https://zantfoundation.github.io/Website/), and [Arduinos](https://www.arduino.cc/).
+**Duration:** 24 hours
 
-This project was started during the [Tiny_Hack_v1](https://luma.com/59rubmuv) by the following team:
+Build a creative computer vision application using:
+- **Focoos** platform for model training
+- **ONNX** export format with quantization library
+- **Arduino Nicla Vision** as deployment target
+- **Zant** for flashing your model
 
-- [Gianpaolo Macario](https://github.com/gmacario)
-- [Gianfranco Poncini](https://github.com/Muwattalli)
-- [Alberto Castronovo](https://github.com/albertocastronovo)
+**Use Case:** Any computer vision application - we'll reward your creativity! 🎨
 
-Please read [README_upstream.md](README_upstream.md) for the Hackathon rules.
+---
 
-## Project Description
+# Submission Requirements
 
-**BeezzaAnts** is a whimsical-sounding but seriously useful **open-source** tool designed to help **pizza shop owners** ensure every pie that leaves the oven is _perfectly cooked_ and _properly classified_.
+Submit via **Pull Request** to this repository
 
-At its core, BeezzaAnts uses **computer vision** and **low-cost Arduino-based sensors** to perform real-time visual inspections of pizzas immediately after baking. It detects:
+### Required Files
+- `.ino` Arduino sketch
+- `.onnx` model file
+- `model_info.json` metadata
+- `README.md` documentation
+- anything relevant (web pages, mobileapp, images, examples ...)
+- **5 slides** presentation deck (`.pdf`)
+  - Use the Google Slides template [here](https://docs.google.com/presentation/d/1c1S4XClzACHqEn-09ESwnSicXFq4gekJ_8vndtCpdOI/edit?usp=sharing): `File → Make a Copy → Entire Presentation`
 
-- The **type of pizza** (e.g., Margherita, Pepperoni, Veggie)
-- The **cooking quality** (well-cooked, undercooked, overburned)
-- Any **irregularities** in toppings or appearance
+### Folder structure
+```
+team-number-project-name/ (example: 7-cool-object-detection)
+├── src/
+│   ├── sketch.ino               # Arduino sketch
+│   ├── model.onnx               # ONNX model
+│   ├── model_info.json          # Model metadata
+│   └── ...                      # (optional) Additional relevant files (web pages, mobile app, etc...)
+│
+├── docs/
+│   ├── README.md                # Extended documentation (setup, usage, pipeline, etc.)
+│   └── other-guides.md          # (optional) additional guides or docs
+│
+├── slides/
+│   └── presentation.pdf         # Presentation deck
+│
+└── README.md                    # Main project readme (overview + quick start)
+```
 
-The tool integrates seamlessly with a mobile application that allows users (e.g., staff or even customers) to:
+### Selection Process:
+- ✅ All submissions reviewed
+- 🎤 Top 5 teams selected for live demo
+- 🏆 3 winning teams announced
 
-- **Select the pizza type** they expect or prefer
-- **View inspection results** in real-time
-- **Receive alerts** when a pizza doesn't meet visual or cooking standards
+# 🏆 Award Categories 🏆
 
-Whether you're running a busy pizzeria or a cozy neighborhood joint, BeezzaAnts gives you **automated quality control** with a dash of robotic charm — no need to manually check every pie.
+## 🌟 Impact Trophy
+*Most innovative and original application concept*
 
-### Why the Name?
+## 💻 Clean Code Champion
+*Best code quality, documentation, and software engineering practices*
 
-Just like a **swarm of bees and ants**, BeezzaAnts works tirelessly and collectively to analyze, inspect, and report — with the speed and precision your pizza deserves. And yes, _we also_ love pizza way too much.
+## 🚀 Technical Trophy
+*Most technically impressive or groundbreaking implementation*
 
-## Copyright and license
 
-Copyright (C) 2025, [B-AROL-O Team](https://github.com/B-AROL-O), all rights reserved.
+# Some Food for Thought
 
-### Source code license
+As you build your solution, here are some aspects worth considering:
 
-The source code contained in this repository and the executable distributions are licensed under the terms of the MIT license as detailed in the [LICENSE](LICENSE) file.
+**On Data & Models**
+- How did you choose your dataset? Edge AI has unique constraints that might influence what data works best
+- Why did you pick that specific model architecture? Sometimes smaller is better... 😉
+- Have you thought about the trade-offs between accuracy and efficiency for your particular use case?
 
-### Documentation license
+**On Performance & Deployment**
+- Getting your model running on actual hardware is just the beginning - does it run fast enough for what you're trying to do?
+- A surveillance system might need different framerates than a periodic quality checker
+- What if some of the all computation didn't happen on the device? Pre-processing, post-processing, or complementary algorithms could live elsewhere
 
-![CC BY-SA 4.0](https://i.creativecommons.org/l/by-sa/4.0/88x31.png)
+**On Integration & User Experience**
+- The Nicla Vision can communicate with other systems - how reliable is your connection?
+- Could you visualize your system's output in a way that anyone could understand, not just developers?
+- Have you explored what other sensors the Nicla Vision has beyond the camera? IMU, microphone, environmental sensors...
 
-Please note that your contribution to the project Documentation is licensed under a Creative Commons Attribution-Share Alike 4.0 License. see <https://creativecommons.org/licenses/by-sa/4.0/>
+**On Going Further**
+- What if you ran more than one model? The hardware might surprise you with what it can handle
+- Think about the full pipeline: what happens before and after your model runs?
+- How would someone without technical knowledge interact with your system?
 
-<!-- EOF -->
+---
+
+## 🛠️ Resources
+
+- **Focoos Platform:** Model training & export
+- **Zant Tool:** Model deployment to hardware
+- **Arduino Nicla Vision:** Edge AI hardware platform
+
+See the [`docs/`](./docs) folder for tutorials, troubleshooting, and additional resources 
+
+---  
+
+Good luck, and remember: **creativity counts!** 🎉
