@@ -25,15 +25,14 @@ Submit via **Pull Request** to this repository
 - `.onnx` model file
 - `model_info.json` metadata
 - `README.md` documentation
-- anything relevant ( web pages, mobileapp, images, examples ... )
-- **5 slides** presentation deck (PDF) template [here](https://docs.google.com/presentation/d/1c1S4XClzACHqEn-09ESwnSicXFq4gekJ_8vndtCpdOI/edit?usp=sharing)
+- anything relevant (web pages, mobileapp, images, examples ...)
+- **5 slides** presentation deck (`.pdf`)
+  - Use the Google Slides template [here](https://docs.google.com/presentation/d/1c1S4XClzACHqEn-09ESwnSicXFq4gekJ_8vndtCpdOI/edit?usp=sharing): `File → Make a Copy → Entire Presentation`
 
 ### Selection Process:
 - ✅ All submissions reviewed
 - 🎤 Top 5 teams selected for live demo
 - 🏆 3 winning teams announced
-
-
 
 # 🏆 Award Categories 🏆
 
