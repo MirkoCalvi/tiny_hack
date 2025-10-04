@@ -623,9 +623,51 @@ drwxr-xr-x 4 vscode vscode    4096 Oct  4 16:58 ..
 (BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
+Inspect the library with the following command
+
+```bash
+nm zig-out/beer/libzant.a
+```
+
+Sample output:
+
+```text
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ nm zig-out/beer/libzant.a
+
+/workspaces/BeezzaAnts/external/Z-Ant/.zig-cache/o/3a3d805baf815b5283c58bf35436102b/libzant.a.o:
+                 U abort
+0000000000006505 r __anon_10015
+00000000000005b5 r __anon_10603
+00000000000005e0 r __anon_10625
+00000000000005f2 r __anon_11122
+00000000000005f7 r __anon_11125
+0000000000006b40 r __anon_13504
+0000000000006e60 r __anon_14587
+...
+000000000001a902 r posix.use_libc
+0000000000020350 t posix.write
+                 U pread64
+00000000000be4b0 T predict
+000000000001aedd r process.Child.native_os
+000000000001aee0 r process.Child.ResourceUsageStatistics.rusage_init
+0000000000020cc0 t process.hasNonEmptyEnvVarConstant__anon_5645
+...
+000000000005c020 t __zig_is_named_enum_value_@typeInfo(debug.Dwarf.EntryHeader__union_4181).@"union".tag_type.?
+0000000000088be0 t __zig_is_named_enum_value_@typeInfo(debug.Dwarf.expression.StackMachine(.{ .addr_size = 8, .endian = .little, .call_frame_context = true }).Operand).@"union".tag_type.?
+0000000000063a70 t __zig_is_named_enum_value_@typeInfo(debug.Dwarf.expression.StackMachine(.{ .addr_size = 8, .endian = .little, .call_frame_context = true }).Value).@"union".tag_type.?
+00000000000164d0 t __zig_is_named_enum_value_@typeInfo(debug.Dwarf.FormValue).@"union".tag_type.?
+000000000004f8e0 t __zig_is_named_enum_value_@typeInfo(debug.SelfInfo.VirtualMachine.RegisterRule).@"union".tag_type.?
+0000000000021e00 t __zig_lt_errors_len
+                 U __zig_probe_stack
+000000000005c050 t __zig_tag_name_@typeInfo(debug.Dwarf.EntryHeader__union_4181).@"union".tag_type.?
+0000000000088c10 t __zig_tag_name_@typeInfo(debug.Dwarf.expression.StackMachine(.{ .addr_size = 8, .endian = .little, .call_frame_context = true }).Operand).@"union".tag_type.?
+0000000000063aa0 t __zig_tag_name_@typeInfo(debug.Dwarf.expression.StackMachine(.{ .addr_size = 8, .endian = .little, .call_frame_context = true }).Value).@"union".tag_type.?
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
+```
+
 ### 3. Package as an Arduino library
 
-<!-- (2025-10-03 15:30 CEST) -->
+<!-- (2025-10-04 19:11 CEST) -->
 
 Create an Arduino library folder layout under your Arduino `libraries/` directory:
 
@@ -637,7 +679,7 @@ mkdir -p $HOME/Arduino/libraries/ZantLib/src/cortex-m7
 Copy the produced `.a` into `src/cortex-m7/`:
 
 ```bash
-cp zig-out/mnist-8/libzant.a \
+cp zig-out/beer/libzant.a \
     $HOME/Arduino/libraries/ZantLib/src/cortex-m7
 ```
 
@@ -671,11 +713,37 @@ cp -av \
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ cp -av examples/tiny_hack/ZantLib $HOME/Arduino/libraries/
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ cp -av \
+    examples/tiny_hack/ZantLib \
+    $HOME/Arduino/libraries/
 'examples/tiny_hack/ZantLib/library.properties' -> '/home/vscode/Arduino/libraries/ZantLib/library.properties'
 'examples/tiny_hack/ZantLib/src/cortex-m7/comments' -> '/home/vscode/Arduino/libraries/ZantLib/src/cortex-m7/comments'
 'examples/tiny_hack/ZantLib/src/lib_zant.h' -> '/home/vscode/Arduino/libraries/ZantLib/src/lib_zant.h'
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
+```
+
+Verify the structure of your Arduino library with the following command:
+
+```bash
+tree $HOME/Arduino/libraries/ZantLib
+```
+
+Actual result:
+
+<!-- (2025-10-04 19:13 CEST) -->
+
+```text
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $ tree $HOME/Arduino/libraries/ZantLib
+/home/vscode/Arduino/libraries/ZantLib
+├── library.properties
+└── src
+    ├── cortex-m7
+    │   ├── comments
+    │   └── libzant.a
+    └── lib_zant.h
+
+2 directories, 4 files
+(BeezzaAnts) vscode ➜ /workspaces/BeezzaAnts/external/Z-Ant (gmacario/dev) $
 ```
 
 Your Arduino libraries directory should look like this:
@@ -688,109 +756,40 @@ $HOME/Arduino/libraries/ZantLib
                               |...lib_zant.a
 ```
 
-Actual result:
-
-```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ tree $HOME/Arduino/libraries/ZantLib
-/home/vscode/Arduino/libraries/ZantLib
-├── library.properties
-└── src
-    ├── cortex-m7
-    │   ├── comments
-    │   └── libzant.a
-    └── lib_zant.h
-
-2 directories, 4 files
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $
-```
-
 **NOTE**: If your Arduino header is `lib_zant.h`, make sure it declares the prediction entry point (e.g. `int predict(float*, uint32_t*, uint32_t, float**);`).
 You can find an example at `examples/tiny_hack/ZantLib/src/lib_zant.h`.
 
-### TODO 4. Arduino sketch: enable QSPI XPI and call `predict`
+### 4. Arduino sketch: enable QSPI XPI and call `predict`
 
-TODO
+<!-- (2025-10-04 19:15 CEST) -->
+
+See example in <https://github.com/ZantFoundation/Z-Ant/blob/main/examples/tiny_hack/tiny_hack.ino>
 
 ### TODO 5. Custom linker: map `.flash_weights` to QSPI
 
-TODO
+See example in <https://github.com/ZantFoundation/Z-Ant/blob/main/examples/tiny_hack/custom.ld>
 
 **IMPORTANT**: Your Zig build must emit into a section named `.flash_weights` (or adjust names consistently in both the codegen and this script).
 The Arduino sketch exports `flash_weights_base` at `0x90000000` for the Zig library to reference.
 So ensure that the flag **-Dxip** is set to true when codegenerating the library.
 
-### TODO: 6. Compile with Arduino CLI using the custom linker
-
-From the sketch folder containing `tiny_hack.ino` and `custom.ld`:
+### 5b. Make sure that the required Arduino core is installed
 
 ```bash
-cd examples/tiny_hack
-FQBN="arduino:mbed_nicla:nicla_vision"
-
-arduino-cli compile \
-  --fqbn "$FQBN" \
-  --export-binaries \
-  --libraries $HOME/Arduino/libraries \
-  --build-property "compiler.c.elf.extra_flags=-Wl,-T$PWD/custom.ld"
+arduino-cli core install arduino:mbed_nicla
 ```
-
-<!-- (2025-10-03 15:36 CEST) -->
 
 Result:
 
 ```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant (gmacario/dev) $ cd examples/tiny_hack/
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $ FQBN="arduino:mbed_nicla:nicla_vision"
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $ arduino-cli compile \
-  --fqbn "$FQBN" \
-  --export-binaries \
-  --libraries $HOME/Arduino/libraries \
-  --build-property "compiler.c.elf.extra_flags=-Wl,-T$PWD/custom.ld"
-Downloading index: library_index.tar.bz2 downloaded                                                                   
-Downloading index: package_index.tar.bz2 downloaded
-Downloading missing tool builtin:ctags@5.8-arduino11...
-builtin:ctags@5.8-arduino11 downloaded
-Installing builtin:ctags@5.8-arduino11...
-Skipping tool configuration....
-builtin:ctags@5.8-arduino11 installed
-Downloading missing tool builtin:dfu-discovery@0.1.2...
-builtin:dfu-discovery@0.1.2 downloaded
-Installing builtin:dfu-discovery@0.1.2...
-Skipping tool configuration....
-builtin:dfu-discovery@0.1.2 installed
-Downloading missing tool builtin:mdns-discovery@1.0.9...
-builtin:mdns-discovery@1.0.9 downloaded
-Installing builtin:mdns-discovery@1.0.9...
-Skipping tool configuration....
-builtin:mdns-discovery@1.0.9 installed
-Downloading missing tool builtin:serial-discovery@1.4.1...
-builtin:serial-discovery@1.4.1 downloaded
-Installing builtin:serial-discovery@1.4.1...
-Skipping tool configuration....
-builtin:serial-discovery@1.4.1 installed
-Downloading missing tool builtin:serial-monitor@0.15.0...
-builtin:serial-monitor@0.15.0 downloaded
-Installing builtin:serial-monitor@0.15.0...
-Skipping tool configuration....
-builtin:serial-monitor@0.15.0 installed
-Error during build: Platform 'arduino:mbed_nicla' not found: platform not installed
-Try running `arduino-cli core install arduino:mbed_nicla`
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $
-```
-
-<!-- (2025-10-03 15:40 CEST) -->
-
-Apply the suggested fix:
-
-```text
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $ arduino-cli core install arduino:mbed_nicla
+(BeezzaAnts) vscode ➜ .../external/Z-Ant/examples/tiny_hack (gmacario/dev) $ arduino-cli core install arduino:mbed_nicla
 Downloading packages...
-arduino:arm-none-eabi-gcc@7-2017q4 downloaded
-arduino:bossac@1.9.1-arduino2 downloaded
-arduino:dfu-util@0.10.0-arduino1 downloaded
-arduino:openocd@0.11.0-arduino2 downloaded
-arduino:rp2040tools@1.0.6 downloaded
-arduino:mbed_nicla@4.4.1 downloaded
+arduino:arm-none-eabi-gcc@7-2017q4 downloaded                                                                                                                                                                                                                         
+arduino:bossac@1.9.1-arduino2 downloaded                                                                                                                                                                                                                              
+arduino:dfu-util@0.10.0-arduino1 downloaded                                                                                                                                                                                                                           
+arduino:openocd@0.11.0-arduino2 downloaded                                                                                                                                                                                                                            
+arduino:rp2040tools@1.0.6 downloaded                                                                                                                                                                                                                                  
+arduino:mbed_nicla@4.4.1 downloaded                                                                                                                                                                                                                                   
 Installing arduino:arm-none-eabi-gcc@7-2017q4...
 Configuring tool....
 arduino:arm-none-eabi-gcc@7-2017q4 installed
@@ -815,14 +814,17 @@ sudo "/home/vscode/.arduino15/packages/arduino/hardware/mbed_nicla/4.4.1/post_in
 
 
 Platform arduino:mbed_nicla@4.4.1 installed
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $
+(BeezzaAnts) vscode ➜ .../external/Z-Ant/examples/tiny_hack (gmacario/dev) $
 ```
 
-<!-- (2025-10-03 15:44 CEST) -->
+### 6. Compile with Arduino CLI using the custom linker
 
-then retry:
+From the sketch folder containing `tiny_hack.ino` and `custom.ld`:
 
 ```bash
+cd examples/tiny_hack
+FQBN="arduino:mbed_nicla:nicla_vision"
+
 arduino-cli compile \
   --fqbn "$FQBN" \
   --export-binaries \
@@ -830,9 +832,12 @@ arduino-cli compile \
   --build-property "compiler.c.elf.extra_flags=-Wl,-T$PWD/custom.ld"
 ```
 
+<!-- (2025-10-04 19:27 CEST) -->
+
 Result:
-```
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $ arduino-cli compile \
+
+```text
+(BeezzaAnts) vscode ➜ .../external/Z-Ant/examples/tiny_hack (gmacario/dev) $ arduino-cli compile \
   --fqbn "$FQBN" \
   --export-binaries \
   --libraries $HOME/Arduino/libraries \
@@ -849,7 +854,7 @@ Zant         1.0.0   /home/vscode/Arduino/libraries/ZantLib
 Used platform      Version Path
 arduino:mbed_nicla 4.4.1   /home/vscode/.arduino15/packages/arduino/hardware/mbed_nicla/4.4.1
 Error during build: exit status 1
-(Z-Ant) vscode ➜ /workspaces/Z-Ant/examples/tiny_hack (gmacario/dev) $
+(BeezzaAnts) vscode ➜ .../external/Z-Ant/examples/tiny_hack (gmacario/dev) $
 ```
 
 TODO TODO TODO
