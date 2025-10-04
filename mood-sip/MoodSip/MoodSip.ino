@@ -20,6 +20,7 @@ extern "C" {
 extern "C" __attribute__((used)) const uint8_t *flash_weights_base =
     (const uint8_t *)0x90000000u;
 
+#include "src/StateMachine.h"
 #include <Arduino.h>
 #include <lib_zant.h> // int predict(float*, uint32_t*, uint32_t, float**)
 
@@ -191,6 +192,9 @@ static void printOutput(const float *out, int len) {
 
 unsigned int count = 0;
 
+// State Machine
+TrackDrinkingMovingSM sm;
+
 void setup() {
   Serial.begin(115200);
   uint32_t t0 = millis();
@@ -222,29 +226,25 @@ void setup() {
         inputData[idx] = (c == 0) ? 0.8f : (c == 1 ? 0.5f : 0.2f);
       }
 
-  // float *out = nullptr;
-  // Serial.println("[Predict] Calling predict()...");
-  // int rc = -3;
-  // unsigned long average_sum = 0;
+  Serial.println("Initial state: " + sm.stateToString());
 
-  // for (uint32_t i = 0; i < 10; i++) {
-  //   unsigned long t_us0 = micros();
-  //   rc = predict(inputData, inputShape, 4, &out);
-  //   unsigned long t_us1 = micros();
-  //   average_sum = average_sum + t_us1 - t_us0;
-  //   if (rc != 0)
-  //     break;
-  // }
+  if (sm.startDrinking())
+    Serial.println("Moved to DRINKING");
+  else
+    Serial.println("Failed to start drinking");
 
-  // Serial.print("[Predict] rc=");
-  // Serial.println(rc);
-  // Serial.print("[Predict] us=");
-  // Serial.println((unsigned long)(average_sum / 10));
-  // if (rc == 0 && out) {
-  //   printOutput(out, OUT_LEN);
-  // } else {
-  //   Serial.println("[Predict] FAIL");
-  // }
+  Serial.println("Current state: " + sm.stateToString());
+
+  if (sm.startMoving())
+    Serial.println("Moved to MOVING");
+  else
+    Serial.println("Cannot start moving while drinking");
+
+  sm.stopDrinking(); // back to TRACK
+  Serial.println("Back to TRACK: " + sm.stateToString());
+
+  sm.startMoving(); // now legal
+  Serial.println("Now MOVING: " + sm.stateToString());
 }
 
 void loop() {

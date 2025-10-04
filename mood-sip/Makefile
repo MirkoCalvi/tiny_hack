@@ -1,5 +1,5 @@
 FQBN ?= arduino:mbed_nicla:nicla_vision
-SKETCH_DIR ?= src/MoodSip
+SKETCH_DIR ?= MoodSip
 SKETCH ?= MoodSip.ino
 BUILD_DIR ?= build
 ARDUINO_CLI ?= arduino-cli
