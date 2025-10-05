@@ -1,0 +1,83 @@
+from __future__ import annotations
+import re
+import time
+import threading
+from typing import Optional
+
+from .state import data_lock, latest_data_by_camera, event_log, get_current_timestamp
+
+ZANT_RE = re.compile(r"label\s*=\s*([A-Za-z0-9_]+).*?prob\s*=\s*([0-9]*\.?[0-9]+)")
+
+def _parse_zant_line(line: str) -> Optional[tuple[str, float]]:
+    """
+    Estrae (label, prob) da una riga tipo:
+    '[ZANT] PERSON top1: idx=1 label=not_person prob=0.926 time=1958.3 ms'
+    """
+    m = ZANT_RE.search(line)
+    if not m:
+        return None
+    label = m.group(1).strip()
+    try:
+        prob = float(m.group(2))
+    except Exception:
+        return None
+    return (label, prob)
+
+def _push_event(ev_type: str, cam_id: str, payload: dict):
+    """
+    Aggiunge un evento al log degli eventi.
+    """
+    event_log.append({
+        "time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(get_current_timestamp())),
+        "cam_id": cam_id,
+        "event": ev_type,
+        "value": str(payload)
+    })
+
+def serial_reader(port: str, baud: int, cam_id: str):
+    """
+    Legge la seriale della Nicla FOMO e aggiorna latest_data_by_camera[cam_id]
+    con: mode='fomo', fomo_label, fomo_prob; e genera un evento 'FOMO'.
+    """
+    try:
+        import serial  # pyserial
+    except Exception as e:
+        print(f"[SER {cam_id}] pyserial mancante: pip install pyserial ({e})")
+        return
+
+    while True:
+        try:
+            print(f"[SER {cam_id}] Opening {port} @ {baud} ...")
+            with serial.Serial(port, baud, timeout=1) as ser:
+                # pulisci buffer
+                ser.reset_input_buffer()
+                ser.reset_output_buffer()
+                print(f"[SER {cam_id}] OK, in ascolto.")
+                # loop righe
+                for raw in ser:
+                    try:
+                        line = raw.decode("utf-8", errors="ignore").strip()
+                    except Exception:
+                        continue
+                    if not line:
+                        continue
+
+                    # prova a parare una riga ZANT
+                    parsed = _parse_zant_line(line)
+                    if not parsed:
+                        continue
+                    label, prob = parsed
+                    ts = get_current_timestamp()
+                    with data_lock:
+                        latest_data_by_camera[cam_id] = {
+                            "ts": ts,
+                            "cam_id": cam_id,
+                            "mode": "fomo",
+                            "fomo_label": label,
+                            "fomo_prob": prob
+                        }
+                        _push_event("FOMO", cam_id, {"label": label, "prob": prob})
+
+        except Exception as e:
+            print(f"[SER {cam_id}] errore seriale: {e}")
+            time.sleep(2.0)  # retry
