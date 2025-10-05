@@ -5,7 +5,7 @@ set -e
 ARD="$HOME/.arduino15/packages/arduino/tools/arm-none-eabi-gcc/7-2017q4/bin"
 READELF="$ARD/arm-none-eabi-readelf"
 OBJCOPY="$ARD/arm-none-eabi-objcopy"
-ELF="./build/arduino.mbed_nicla.nicla_vision/tiny_hack.ino.elf"
+ELF="./build/arduino.mbed_nicla.nicla_vision/arduino.ino.elf"
 
 echo "=== Nicla Vision XIP Flashing Script ==="
 

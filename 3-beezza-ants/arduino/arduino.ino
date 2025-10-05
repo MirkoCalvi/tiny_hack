@@ -1,3 +1,26 @@
+/**
+ * Project: Beezza-Ants
+ * File: tiny_hack.ino
+ */
+
+#include <WiFi.h>
+
+// Copied from https://forum.arduino.cc/t/arduino-nicla-vision-is-not-connecting-to-wifi/1032159
+
+#include "arduino_secrets.h" 
+///////please enter your sensitive data in the Secret tab/arduino_secrets.h
+char ssid[] = SECRET_SSID;        // your network SSID (name)
+char pass[] = SECRET_PASS;        // your network password (use for WPA, or use as key for WEP)
+int keyIndex = 0;                 // your network key Index number (needed only for WEP)
+
+int status = WL_IDLE_STATUS;
+// if you don't want to use DNS (and reduce your sketch size)
+// use the numeric IP instead of the name for the server:
+// IPAddress server(93,184,216,34);  // IP address for example.com (no DNS)
+char server[] = "example.com";       // host name for example.com (using DNS)
+
+WiFiClient client;
+
 /************ Nicla Vision QSPI XIP (Memory-Mapped) + predict ************
  * Core: arduino:mbed_nicla (4.4.1)
  * - HAL QSPI (QUADSPI)
@@ -196,12 +219,67 @@ static void printOutput(const float *out, int len)
     Serial.println("==============");
 }
 
+
+void printWifiStatus() {
+  // print the SSID of the network you're attached to:
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+
+  // print your board's IP address:
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+
+  // print the received signal strength:
+  long rssi = WiFi.RSSI();
+  Serial.print("signal strength (RSSI):");
+  Serial.print(rssi);
+  Serial.println(" dBm");
+}
+
 void setup()
 {
     Serial.begin(115200);
     uint32_t t0 = millis();
     while (!Serial && (millis() - t0) < 4000)
         delay(10);
+
+    // check for the WiFi module:
+    if (WiFi.status() == WL_NO_SHIELD)
+    {
+        Serial.println("Communication with WiFi module failed!");
+        // don't continue
+        while (true)
+            ;
+    }
+
+    // attempt to connect to Wifi network:
+    while (status != WL_CONNECTED)
+    {
+        Serial.print("Attempting to connect to SSID: ");
+        Serial.println(ssid);
+        // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
+        status = WiFi.begin(ssid, pass);
+
+        // wait 3 seconds for connection:
+        delay(3000);
+    }
+    Serial.println("Connected to wifi");
+    printWifiStatus();
+
+    Serial.println("\nStarting connection to server...");
+    // if you get a connection, report back via serial:
+    if (client.connect(server, 80))
+    {
+        Serial.println("connected to server");
+        // Make a HTTP request:
+        client.println("GET /index.html HTTP/1.1");
+        client.print("Host: ");
+        client.println(server);
+        client.println("Connection: close");
+        client.println();
+    }
+
     Serial.println("\n== Nicla Vision QSPI XIP (HAL) + predict ==");
 
     if (qspi_init_16mb(&hqspi) != HAL_OK)
