@@ -1,12 +1,6 @@
-# tiny hack
+# Setup Steps
 
-## context
-
-context.md
-
-## Setup Steps
-
-### 1. Run Frontend
+## 1. Run Frontend
 
 ```bash
 cd frontend
@@ -20,7 +14,7 @@ npm run dev
 
 Frontend runs on `http://localhost:5173`
 
-### 2. Run Backend
+## 2. Run Backend
 
 ```bash
 # Install dependencies
@@ -32,7 +26,7 @@ cd backend && uv run python run.py
 
 Backend runs on `http://0.0.0.0:3002`
 
-### 3. Run macOS Setup
+## 3. Run macOS Setup
 
 This script installs required tools (Homebrew, arduino-cli, zig, dfu-util, uv) and sets up the Arduino environment for the cards:
 
@@ -40,7 +34,7 @@ This script installs required tools (Homebrew, arduino-cli, zig, dfu-util, uv) a
 ./macos_setup.sh
 ```
 
-### 4. Run AIO for Serial Cards
+## 4. Run AIO for Serial Cards
 
 Run `./aio.sh` for both cards on serial port number 1 and 2:
 
@@ -54,7 +48,7 @@ Run `./aio.sh` for both cards on serial port number 1 and 2:
 
 The `aio.sh` script takes a command line argument (1 or 2) to specify which card to use.
 
-## How It Works
+# How It Works
 
 When `aio.sh` has compiled the model and flashed it onto the card, it calls `tv.py` which:
 - Reads the JSON streams from the cards
