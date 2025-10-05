@@ -1,0 +1,11 @@
+{
+  "model_name": "cinecla_vision_model",
+  "team": "4-cinecla-daniel-manfredi-francesco",
+  "description": "Dummy computer vision model for the challenge",
+  "input_shape": [1, 3, 224, 224],
+  "output_shape": [1, 10],
+  "quantization": "int8",
+  "framework": "onnx",
+  "version": "1.0.0",
+  "authors": ["Daniel", "Manfredi", "Francesco"]
+}
