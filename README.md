@@ -40,3 +40,14 @@ At last, in order to access the dashboard, and save the serial communication wit
 make build-frontend
 make serve
 ```
+
+## Contributors
+
+- [@KokkuApples](https://github.com/KokkuApples) - Federico Mele
+- [@pasc4le](https://github.com/pasc4le/) - Giuseppe Pascale
+- [@Paolo410](https://github.com/Paolo410) - Paolo Malugani
+- [@Sampli1](https://github.com/Sampli1) - Sandro Marghella
+
+## Further on...
+
+You can check out the detailed technical README in the docs folder.
