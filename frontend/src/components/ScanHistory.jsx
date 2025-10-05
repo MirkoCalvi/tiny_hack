@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { History, CheckCircle, XCircle, AlertTriangle, Leaf, Calendar, TrendingUp, Filter } from 'lucide-react';
+import { History, CheckCircle, XCircle, AlertTriangle, Calendar, TrendingUp, Filter } from 'lucide-react';
 import {getAllScans} from "../API.js";
 
 export default function ScanHistoryPage() {
@@ -11,56 +11,11 @@ export default function ScanHistoryPage() {
 
         const fetchAllScans = async () => {
             const allScans = await getAllScans();
-            setScanHistory(Array.isArray(allScans) ? allScans : []);
+            setScanHistory(allScans);
         }
 
         fetchAllScans();
     }, []);
-
-    useEffect(() => {
-        const total = scanHistory.length;
-        const edible = scanHistory.filter(s => s.edibility === 'edible').length;
-        const toxic = scanHistory.filter(s => s.edibility === 'toxic').length;
-        const unknown = scanHistory.filter(s => s.edibility === 'unknown').length;
-        setStats({ total, edible, toxic, unknown });
-    }, [scanHistory]);
-
-    const groupScansByDate = () => {
-        const filtered = Array.isArray(scanHistory)
-            ? (filterEdibility === 'all'
-                ? scanHistory
-                : scanHistory.filter(s => s.edibility === filterEdibility))
-            : [];
-
-        const grouped = filtered.reduce((acc, scan) => {
-            const date = new Date(scan.timestamp);
-            const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-
-            let dateKey;
-            if (date.toDateString() === today.toDateString()) {
-                dateKey = 'Today';
-            } else if (date.toDateString() === yesterday.toDateString()) {
-                dateKey = 'Yesterday';
-            } else {
-                dateKey = date.toLocaleDateString('it-IT', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            }
-
-            if (!acc[dateKey]) {
-                acc[dateKey] = [];
-            }
-            acc[dateKey].push(scan);
-            return acc;
-        }, {});
-
-        return grouped;
-    };
 
     const getEdibilityBadge = (edibility) => {
         const config = {
@@ -76,8 +31,6 @@ export default function ScanHistoryPage() {
         );
     };
 
-    const groupedScans = groupScansByDate();
-
     return (
         <div className="min-h-screen w-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800">
             <div className="px-4 py-6 w-full">
@@ -91,6 +44,9 @@ export default function ScanHistoryPage() {
                             </h1>
                         </div>
                         <p className="text-gray-600 text-center">Your mushroom detection archive</p>
+                        <button className="bg-red-300 text-white hover:bg-gray-300 rounded-5" onClick={() => window.location.href = '/'}>
+                            Scan
+                        </button>
                     </div>
                 </div>
 
@@ -201,7 +157,7 @@ export default function ScanHistoryPage() {
 
                 {/* History grouped by date */}
                 <div className="max-w-6xl mx-auto">
-                    {Object.keys(groupedScans).length === 0 ? (
+                    {Object.keys(scanHistory).length === 0 ? (
                         <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-12">
                             <div className="text-center text-gray-400">
                                 <History size={60} className="mb-4 opacity-25 mx-auto" />
@@ -210,45 +166,35 @@ export default function ScanHistoryPage() {
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            {Object.entries(groupedScans).map(([date, scans]) => (
-                                <div key={date} className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-6">
-                                    <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-purple-200">
-                                        <Calendar size={24} className="text-purple-600" />
-                                        <h2 className="text-2xl font-bold text-gray-800 capitalize">{date}</h2>
-                                        <span className="ml-auto bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">
-                                            {scans.length} {scans.length === 1 ? 'scan' : 'scans'}
-                                        </span>
-                                    </div>
-
+                            {Object.entries(scanHistory.items).map((scan) => (
+                                <div key={scan.id} className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-6">
                                     <div className="space-y-4">
-                                        {scans.map((scan) => (
-                                            <div key={scan.id} className="border-b border-gray-200 pb-4 last:border-b-0">
-                                                <div className="flex flex-col sm:flex-row gap-4">
-                                                    <img
-                                                        src={scan.imageUrl}
-                                                        alt={scan.commonName}
-                                                        className="w-full sm:w-48 h-32 object-cover rounded-lg shadow-md"
-                                                    />
-                                                    <div className="flex-grow">
-                                                        <div className="flex justify-between items-start flex-wrap gap-2 mb-3">
-                                                            <div>
-                                                                <h5 className="text-xl font-bold text-gray-800">{scan.commonName}</h5>
-                                                                <p className="text-gray-600 italic text-sm">{scan.mushroomName}</p>
-                                                            </div>
-                                                            {getEdibilityBadge(scan.edibility)}
+                                        <div key={scan.id} className="border-b border-gray-200 pb-4 last:border-b-0">
+                                            <div className="flex flex-col sm:flex-row gap-4">
+                                                <img
+                                                    src={scan.image_url}
+                                                    alt={scan.commonName}
+                                                    className="w-full sm:w-48 h-32 object-cover rounded-lg shadow-md"
+                                                />
+                                                <div className="flex-grow">
+                                                    <div className="flex justify-between items-start flex-wrap gap-2 mb-3">
+                                                        <div>
+                                                            <h5 className="text-xl font-bold text-gray-800">{scan.commonName}</h5>
+                                                            <p className="text-gray-600 italic text-sm">{scan.mushroomName}</p>
                                                         </div>
-                                                        <div className="flex gap-4 flex-wrap text-sm text-gray-600">
+                                                        {getEdibilityBadge(scan.edibility)}
+                                                    </div>
+                                                    <div className="flex gap-4 flex-wrap text-sm text-gray-600">
                                                             <span>
-                                                                <strong>Confidence:</strong> {scan.confidence}%
+                                                                <strong>Confidence:</strong> {scan.score}%
                                                             </span>
-                                                            <span>
+                                                        <span>
                                                                 <strong>Time:</strong> {new Date(scan.timestamp).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}
                                                             </span>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        ))}
+                                        </div>
                                     </div>
                                 </div>
                             ))}

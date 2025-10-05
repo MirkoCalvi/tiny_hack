@@ -12,10 +12,11 @@ export default function HomePage() {
         setCurrentScan(null);
 
         const inferenceData = await inferImage(true);
-
+        setCurrentScan(inferenceData);
+        setIsScanning(false);
         // {"class":11,"image_url":"http://10.100.16.76:5000/images/nicla_20251005_102756_771195.png","latency_us":2006856,"score":1.732289,"timestamp":1759652876808}
 
-        const saveInference = await postScan(inferenceData);
+        await postScan(inferenceData);
     };
 
     useEffect(() => {
@@ -54,13 +55,16 @@ export default function HomePage() {
                             </h1>
                         </div>
                         <p className="text-gray-600 text-center">Powered by Arduino Nicla Vision</p>
+                        <button className="bg-red-300 text-white hover:bg-gray-300 rounded-5" onClick={() => window.location.href = '/history'}>
+                            Scan History
+                        </button>
                     </div>
                 </div>
 
                 {/* Scanner View */}
                 <div className="mb-6 max-w-4xl mx-auto">
                     <div className="bg-white rounded-2xl shadow-2xl p-6">
-                        <div
+                        {!currentScan ? <div
                             className="flex items-center justify-center rounded-xl overflow-hidden relative"
                             style={{
                                 background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
@@ -87,6 +91,8 @@ export default function HomePage() {
                                 </div>
                             )}
                         </div>
+                            : <img alt="scanned img" src={currentScan.image_url} />
+                        }
 
                         <div className="text-center mt-6">
                             <button
@@ -109,15 +115,15 @@ export default function HomePage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <p className="text-sm text-gray-500 mb-1">Scientific Name</p>
-                                    <h5 className="text-xl font-semibold italic text-gray-800">{currentScan.mushroomName}</h5>
+                                    <h5 className="text-xl font-semibold italic text-gray-800">{currentScan.class}</h5>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500 mb-1">Common Name</p>
-                                    <h5 className="text-xl font-semibold text-gray-800">{currentScan.commonName}</h5>
+                                    <h5 className="text-xl font-semibold text-gray-800">{currentScan.commonName || "No name"}</h5>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500 mb-2">Edibility</p>
-                                    {getEdibilityBadge(currentScan.edibility)}
+                                    {getEdibilityBadge(currentScan.edibility || 'unknown')}
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500 mb-2">Confidence</p>

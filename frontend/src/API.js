@@ -1,5 +1,5 @@
 const BASE_URL = 'http://localhost:8080';
-const REMOTE_URL = 'http://localhost:5000'
+const REMOTE_URL = 'http://10.100.16.76:5000'
 
 export async function getAllScans({ limit = 200, offset = 0 } = {}) {
   const url = `${BASE_URL}/allScans?limit=${limit}&offset=${offset}`;
