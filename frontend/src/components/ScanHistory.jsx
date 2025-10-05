@@ -91,6 +91,9 @@ export default function ScanHistoryPage() {
                             </h1>
                         </div>
                         <p className="text-gray-600 text-center">Your mushroom detection archive</p>
+                        <button className="bg-red-300 text-white hover:bg-gray-300 rounded-5" onClick={() => window.location.href = '/'}>
+                            Scan
+                        </button>
                     </div>
                 </div>
 

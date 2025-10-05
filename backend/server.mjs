@@ -27,24 +27,22 @@ fs.mkdirSync(IMAGE_DIR, { recursive: true });
 const db = new Database(path.join(process.cwd(), "scans.db"));
 db.pragma("journal_mode = WAL");
 db.exec(`CREATE TABLE IF NOT EXISTS scans (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  class INTEGER,
-  score REAL,
-  latency_us INTEGER,
-  ts INTEGER,
-  image_filename TEXT,
-  source TEXT,
-  meta TEXT);`);
+                                              id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                              class INTEGER,
+                                              score REAL,
+                                              latency_us INTEGER,
+                                              timestamp INTEGER,
+                                              image_url TEXT
+         );`);
 
-// Prepared statements
 const insertScan = db.prepare(`
-  INSERT INTO scans (class, score, latency_us, ts, image_filename, source, meta)
-  VALUES (@class, @score, @latency_us, @ts, @image_filename, @source, @meta)
+    INSERT INTO scans (class, score, latency_us, timestamp, image_url)
+    VALUES (@class, @score, @latency_us, @timestamp, @image_url)
 `);
-const selectById = db.prepare(`SELECT * FROM scans WHERE id = ?`);
 const selectAll = db.prepare(`
-  SELECT * FROM scans ORDER BY ts DESC LIMIT ? OFFSET ?
+    SELECT * FROM scans ORDER BY timestamp DESC LIMIT ? OFFSET ?
 `);
+
 const deleteById = db.prepare(`DELETE FROM scans WHERE id = ?`);
 const countAll = db.prepare(`SELECT COUNT(*) as n FROM scans`);
 
@@ -98,14 +96,13 @@ app.post("/scans", upload.single("image"), async (req, res) => {
             class: isNaN(klass) ? null : klass,
             score: isNaN(score) ? null : score,
             latency_us: isNaN(latency) ? null : latency,
-            ts,
+            timestamp: ts,
             image_url: image_url,
         };
 
         const info = insertScan.run(row);
-        const saved = selectById.get(info.lastInsertRowid);
 
-        res.status(201).json(saved);
+        res.status(201);
     } catch (e) {
         console.error(e);
         res.status(400).json({ error: String(e.message || e) });
