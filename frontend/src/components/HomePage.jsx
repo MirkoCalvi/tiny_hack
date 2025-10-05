@@ -7,6 +7,117 @@ export default function HomePage() {
     const [scanHistory, setScanHistory] = useState([]);
     const [currentScan, setCurrentScan] = useState(null);
 
+    const mushroomClasses = [
+        "Agaricus bisporus",
+        "Agaricus subrufescens",
+        "Amanita bisporigera",
+        "Amanita muscaria",
+        "Amanita ocreata",
+        "Amanita phalloides",
+        "Amanita smithiana",
+        "Amanita verna",
+        "Amanita virosa",
+        "Auricularia auricula-judae",
+        "Boletus edulis",
+        "Cantharellus cibarius",
+        "Clitocybe dealbata",
+        "Conocybe filaris",
+        "Coprinus comatus",
+        "Cordyceps sinensis",
+        "Cortinarius rubellus",
+        "Entoloma sinuatum",
+        "Flammulina velutipes",
+        "Galerina marginata",
+        "Ganoderma lucidum",
+        "Grifola frondosa",
+        "Gyromitra esculenta",
+        "Hericium erinaceus",
+        "Hydnum repandum",
+        "Hypholoma fasciculare",
+        "Inocybe erubescens",
+        "Lentinula edodes",
+        "Lepiota brunneoincarnata",
+        "Macrolepiota procera",
+        "Morchella esculenta",
+        "Omphalotus olearius",
+        "Paxillus involutus",
+        "Pholiota nameko",
+        "Pleurotus citrinopileatus",
+        "Pleurotus eryngii",
+        "Pleurotus ostreatus",
+        "Psilocybe semilanceata",
+        "Rhodophyllus rhodopolius",
+        "Russula emetica",
+        "Russula virescens",
+        "Scleroderma citrinum",
+        "Suillus luteus",
+        "Tremella fuciformis",
+        "Tricholoma matsutake",
+        "Truffles",
+        "Tuber melanosporum"
+    ];
+
+    const mushroomEdibility = {
+        "Agaricus bisporus": "edible",
+        "Agaricus subrufescens": "edible",
+        "Amanita bisporigera": "poisonous",
+        "Amanita muscaria": "poisonous",
+        "Amanita ocreata": "poisonous",
+        "Amanita phalloides": "poisonous",
+        "Amanita smithiana": "poisonous",
+        "Amanita verna": "poisonous",
+        "Amanita virosa": "poisonous",
+        "Auricularia auricula-judae": "edible",
+        "Boletus edulis": "edible",
+        "Cantharellus cibarius": "edible",
+        "Clitocybe dealbata": "poisonous",
+        "Conocybe filaris": "poisonous",
+        "Coprinus comatus": "edible",
+        "Cordyceps sinensis": "edible",
+        "Cortinarius rubellus": "poisonous",
+        "Entoloma sinuatum": "poisonous",
+        "Flammulina velutipes": "edible",
+        "Galerina marginata": "poisonous",
+        "Ganoderma lucidum": "edible",
+        "Grifola frondosa": "edible",
+        "Gyromitra esculenta": "poisonous",
+        "Hericium erinaceus": "edible",
+        "Hydnum repandum": "edible",
+        "Hypholoma fasciculare": "poisonous",
+        "Inocybe erubescens": "poisonous",
+        "Lentinula edodes": "edible",
+        "Lepiota brunneoincarnata": "poisonous",
+        "Macrolepiota procera": "edible",
+        "Morchella esculenta": "edible",
+        "Omphalotus olearius": "poisonous",
+        "Paxillus involutus": "poisonous",
+        "Pholiota nameko": "edible",
+        "Pleurotus citrinopileatus": "edible",
+        "Pleurotus eryngii": "edible",
+        "Pleurotus ostreatus": "edible",
+        "Psilocybe semilanceata": "poisonous",
+        "Rhodophyllus rhodopolius": "poisonous",
+        "Russula emetica": "poisonous",
+        "Russula virescens": "edible",
+        "Scleroderma citrinum": "poisonous",
+        "Suillus luteus": "edible",
+        "Tremella fuciformis": "edible",
+        "Tricholoma matsutake": "edible",
+        "Truffles": "edible",
+        "Tuber melanosporum": "edible"
+    };
+
+    function getEdibilityByIndex(index) {
+        if (index < 0 || index >= mushroomClasses.length) {
+            return { error: "Invalid class index" };
+        }
+        const species = mushroomClasses[index];
+        return {
+            species,
+            edibility: mushroomEdibility[species] || "unknown"
+        };
+    }
+
     const handleStartScan = async () => {
         setIsScanning(true);
         setCurrentScan(null);
@@ -119,11 +230,11 @@ export default function HomePage() {
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500 mb-1">Common Name</p>
-                                    <h5 className="text-xl font-semibold text-gray-800">{currentScan.commonName || "No name"}</h5>
+                                    <h5 className="text-xl font-semibold text-gray-800">{getEdibilityByIndex(currentScan.class).species || "No name"}</h5>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500 mb-2">Edibility</p>
-                                    {getEdibilityBadge(currentScan.edibility || 'unknown')}
+                                    {getEdibilityBadge(getEdibilityByIndex(currentScan.class).edibility)}
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500 mb-2">Confidence</p>
@@ -131,10 +242,10 @@ export default function HomePage() {
                                         <div className="flex-grow bg-gray-200 rounded-full h-3">
                                             <div
                                                 className="bg-green-500 h-3 rounded-full transition-all"
-                                                style={{ width: `${currentScan.confidence}%` }}
+                                                style={{ width: `${currentScan.score}%` }}
                                             />
                                         </div>
-                                        <span className="font-bold text-gray-800">{currentScan.confidence}%</span>
+                                        <span className="font-bold text-gray-800">{currentScan.score}%</span>
                                     </div>
                                 </div>
                             </div>
