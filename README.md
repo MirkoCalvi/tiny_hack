@@ -20,20 +20,38 @@ Build a creative computer vision application using:
 
 Submit via **Pull Request** to this repository
 
-### Required Files:
+### Required Files
 - `.ino` Arduino sketch
 - `.onnx` model file
 - `model_info.json` metadata
 - `README.md` documentation
-- anything relevant ( web pages, mobileapp, images, examples ... )
-- **5 slides** presentation deck (PDF) template [here](https://docs.google.com/presentation/d/1c1S4XClzACHqEn-09ESwnSicXFq4gekJ_8vndtCpdOI/edit?usp=sharing)
+- anything relevant (web pages, mobileapp, images, examples ...)
+- **5 slides** presentation deck (`.pdf`)
+  - Use the Google Slides template [here](https://docs.google.com/presentation/d/1c1S4XClzACHqEn-09ESwnSicXFq4gekJ_8vndtCpdOI/edit?usp=sharing): `File → Make a Copy → Entire Presentation`
+
+### Folder structure
+```
+team-number-project-name/ (example: 7-cool-object-detection)
+├── src/
+│   ├── sketch.ino               # Arduino sketch
+│   ├── model.onnx               # ONNX model
+│   ├── model_info.json          # Model metadata
+│   └── ...                      # (optional) Additional relevant files (web pages, mobile app, etc...)
+│
+├── docs/
+│   ├── README.md                # Extended documentation (setup, usage, pipeline, etc.)
+│   └── other-guides.md          # (optional) additional guides or docs
+│
+├── slides/
+│   └── presentation.pdf         # Presentation deck
+│
+└── README.md                    # Main project readme (overview + quick start)
+```
 
 ### Selection Process:
 - ✅ All submissions reviewed
 - 🎤 Top 5 teams selected for live demo
 - 🏆 3 winning teams announced
-
-
 
 # 🏆 Award Categories 🏆
 
@@ -78,6 +96,8 @@ As you build your solution, here are some aspects worth considering:
 - **Focoos Platform:** Model training & export
 - **Zant Tool:** Model deployment to hardware
 - **Arduino Nicla Vision:** Edge AI hardware platform
+
+See the [`docs/`](./docs) folder for tutorials, troubleshooting, and additional resources 
 
 ---  
 
