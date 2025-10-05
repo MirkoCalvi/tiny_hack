@@ -1,10 +1,72 @@
-/************ Nicla Vision QSPI XIP (Memory-Mapped) + predict ************
- * Core: arduino:mbed_nicla (4.4.1)
- * - HAL QSPI (QUADSPI)
- * - Pin: CLK=PB2, CS=PG6, IO0..3=PD11..PD14 (AF QUADSPI)
- * - QE su SR2, poi READ 0x6B 1-1-4 con 8 dummy
- *****************************************************************************/
+#include "camera.h"
+#include "gc2145.h"
+#include "lib_zant.h"
+#include <Arduino.h>
+#include <ArduinoBLE.h>
+#include <Arduino_LSM6DSOX.h>
+#include <math.h>
+#include <stdint.h>
+#include <string.h>
 
+// ================= TIMER DINAMICO ==================
+unsigned long baseTimer = 3600000UL;    // timer iniziale: 60 minuti
+unsigned long dynamicTimer = baseTimer; // timer modificabile
+unsigned long lastTimerUpdate = 0;      // tempo ultima modifica
+
+bool gyroActive = false;
+unsigned long gyroChangeStart = 0;
+
+// ================= BLE ==================
+BLEService grayService("12345678-1234-5678-1234-56789abcdef0");
+
+BLECharacteristic grayChar("abcdef01-1234-5678-1234-56789abcdef0",
+                           BLERead | BLENotify,
+                           96 * 96); // frame grayscale
+
+BLECharacteristic commandChar("abcdef02-1234-5678-1234-56789abcdef0",
+                              BLEWrite | BLEWriteWithoutResponse,
+                              1); // comando da PWA: 0 o 1
+
+bool isBleConnected = false;
+
+// ================= Temperatura ==================
+unsigned long lastTempMillis = 0;
+const unsigned long TEMP_INTERVAL = 3600000UL; // 60 minuti in millisecondi
+
+// ================= Config ==================
+#define BAUD 921600
+#define THR 0.60f
+#define RGB565_IS_MSB_FIRST 1 // 1: big-endian (MSB-first), 0: little-endian
+#define STREAM_TO_PC                                                           \
+  0 // 1: stream binario compatibile con viewer Python, 0: solo log
+
+// ================= Modello (NCHW) ==================
+static const uint32_t N = 1, C = 3, H = 96, W = 96; // input RGB channels-first
+static const uint32_t CLASSES = 2;                  // COCO80
+static uint32_t inputShape[4] = {N, C, H, W};       // NCHW
+
+// ================= Buffers ==================
+alignas(32) static float gInput[N * C * H * W]; // Input normalizzato 0..1
+static uint8_t gGray8[W * H]; // anteprima in GRAY8 (non normalizzata)
+
+// ================= Camera ==================
+GC2145 sensor;
+Camera cam(sensor);
+FrameBuffer fb;
+
+// ================= ZANT hooks (deboli) ==================
+extern "C" void setLogFunction(void (*logger)(char *)) __attribute__((weak));
+extern "C" void zant_free_result(float *) __attribute__((weak));
+extern "C" void zant_init_weights_io(void) __attribute__((weak));
+extern "C" void zant_set_weights_base_address(const uint8_t *)
+    __attribute__((weak));
+extern "C" void zant_register_weight_callback(int (*cb)(size_t, uint8_t *,
+                                                        size_t))
+    __attribute__((weak));
+extern "C" __attribute__((used)) const uint8_t *flash_weights_base =
+    (const uint8_t *)0x90000000u;
+
+// ================= QSPI / HAL ==================
 extern "C" {
 #ifndef STM32H747xx
 #define STM32H747xx
@@ -15,266 +77,436 @@ extern "C" {
 #include "stm32h7xx_hal.h"
 #include "stm32h7xx_hal_qspi.h"
 }
-
-// Required by the Zig library:
-extern "C" __attribute__((used)) const uint8_t *flash_weights_base =
-    (const uint8_t *)0x90000000u;
-
-#include "src/StateMachine.h"
-#include <Arduino.h>
-#include <Arduino_LSM6DSOX.h>
-#include <lib_zant.h> // int predict(float*, uint32_t*, uint32_t, float**)
-
 static QSPI_HandleTypeDef hqspi;
 
-static const uint8_t CMD_RDID = 0x9F, CMD_WREN = 0x06;
-static const uint8_t CMD_RDSR1 = 0x05, CMD_RDSR2 = 0x35, CMD_WRSR = 0x01;
-static const uint8_t CMD_READ_QO = 0x6B;
+// ================= Comandi NOR ==================
+static const uint8_t CMD_RDSR1 = 0x05;
+static const uint8_t CMD_RDSR2 = 0x35;
+static const uint8_t CMD_WRSR = 0x01;
+static const uint8_t CMD_WREN = 0x06;
+static const uint8_t CMD_READ_QO = 0x6B; // Quad Output Fast Read
 
-// MSP init (GPIO+clock)
-extern "C" void HAL_QSPI_MspInit(QSPI_HandleTypeDef *h) {
-  if (h->Instance != QUADSPI)
-    return;
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
-  __HAL_RCC_QSPI_CLK_ENABLE();
+// ================= BLE global variables ==================
+enum BleState {
+  IDLE,    // no BLE command pending
+  WAIT_CMD // waiting for a BLE command
+};
 
-  GPIO_InitTypeDef GPIO = {0};
-  // CLK PB2 (AF9)
-  GPIO.Pin = GPIO_PIN_2;
-  GPIO.Mode = GPIO_MODE_AF_PP;
-  GPIO.Pull = GPIO_NOPULL;
-  GPIO.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO.Alternate = GPIO_AF9_QUADSPI;
-  HAL_GPIO_Init(GPIOB, &GPIO);
-  // CS PG6 (AF10)
-  GPIO.Pin = GPIO_PIN_6;
-  GPIO.Alternate = GPIO_AF10_QUADSPI;
-  HAL_GPIO_Init(GPIOG, &GPIO);
-  // IO0..IO3 PD11..PD14 (AF9)
-  GPIO.Pin = GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14;
-  GPIO.Alternate = GPIO_AF9_QUADSPI;
-  HAL_GPIO_Init(GPIOD, &GPIO);
+BleState bleState = IDLE; // stato iniziale BLE
+int clsWaiting = -1;      // classe in attesa
+
+void onBleConnect(BLEDevice central) {
+  isBleConnected = true;
+  Serial.print("[BLE] Connesso a: ");
+  Serial.println(central.address());
+
+  // LED blu acceso per indicare connessione
+  digitalWrite(LEDB, HIGH);
 }
 
-static HAL_StatusTypeDef qspi_init_16mb(QSPI_HandleTypeDef *h) {
-  h->Instance = QUADSPI;
-  h->Init.ClockPrescaler = 7;
-  h->Init.FifoThreshold = 4;
-  h->Init.SampleShifting = QSPI_SAMPLE_SHIFTING_NONE;
-  h->Init.FlashSize = 23; // 2^24 = 16MB -> set 23
-  h->Init.ChipSelectHighTime = QSPI_CS_HIGH_TIME_2_CYCLE;
-  h->Init.ClockMode = QSPI_CLOCK_MODE_0;
-  h->Init.FlashID = QSPI_FLASH_ID_1;
-  h->Init.DualFlash = QSPI_DUALFLASH_DISABLE;
-  return HAL_QSPI_Init(h);
+void onBleDisconnect(BLEDevice central) {
+  isBleConnected = false;
+  Serial.print("[BLE] Disconnesso da: ");
+  Serial.println(central.address());
+
+  // LED blu spento
+  digitalWrite(LEDB, LOW);
+
+  // Reset stato
+  bleState = IDLE;
+  clsWaiting = -1;
 }
 
-static HAL_StatusTypeDef qspi_cmd(QSPI_HandleTypeDef *h, uint8_t inst,
-                                  uint32_t addrMode, uint32_t dataMode,
-                                  uint32_t addr, uint32_t dummy, uint8_t *data,
-                                  size_t len, bool rx) {
-  QSPI_CommandTypeDef c = {0};
-  c.InstructionMode = QSPI_INSTRUCTION_1_LINE;
-  c.Instruction = inst;
-  c.AddressMode = addrMode;
-  c.Address = addr;
-  c.AddressSize = QSPI_ADDRESS_24_BITS;
-  c.DataMode = dataMode;
-  c.NbData = len;
-  c.DummyCycles = dummy;
-  if (HAL_QSPI_Command(h, &c, HAL_MAX_DELAY) != HAL_OK)
-    return HAL_ERROR;
-  if (len == 0)
-    return HAL_OK;
-  return rx ? HAL_QSPI_Receive(h, data, HAL_MAX_DELAY)
-            : HAL_QSPI_Transmit(h, data, HAL_MAX_DELAY);
+// ================= COCO80 ==================
+static const char *COCO80[CLASSES] = {"background", "humans"};
+
+// ================= Helper colore ==================
+static inline uint16_t load_rgb565_BE(const uint8_t *S2, int idx) {
+  return (uint16_t)((S2[2 * idx] << 8) | S2[2 * idx + 1]);
+}
+static inline uint16_t load_rgb565_LE(const uint8_t *S2, int idx) {
+  return (uint16_t)((S2[2 * idx + 1] << 8) | S2[2 * idx]);
+}
+static inline void rgb565_to_rgb888_u16(uint16_t v, uint8_t &R, uint8_t &G,
+                                        uint8_t &B) {
+  uint8_t r5 = (v >> 11) & 0x1F, g6 = (v >> 5) & 0x3F, b5 = v & 0x1F;
+  R = (uint8_t)((r5 << 3) | (r5 >> 2));
+  G = (uint8_t)((g6 << 2) | (g6 >> 4));
+  B = (uint8_t)((b5 << 3) | (b5 >> 2));
+}
+static inline uint8_t clamp_u8(float x) {
+  if (x <= 0.f)
+    return 0;
+  if (x >= 255.f)
+    return 255;
+  return (uint8_t)lrintf(x);
+}
+static inline int clampi(int v, int lo, int hi) {
+  if (v < lo)
+    return lo;
+  if (v > hi)
+    return hi;
+  return v;
 }
 
-static HAL_StatusTypeDef rd_sr(QSPI_HandleTypeDef *h, uint8_t cmd,
-                               uint8_t *val) {
-  return qspi_cmd(h, cmd, QSPI_ADDRESS_NONE, QSPI_DATA_1_LINE, 0, 0, val, 1,
-                  true);
-}
-static HAL_StatusTypeDef wren(QSPI_HandleTypeDef *h) {
-  return qspi_cmd(h, CMD_WREN, QSPI_ADDRESS_NONE, QSPI_DATA_NONE, 0, 0, nullptr,
-                  0, true);
-}
-static HAL_StatusTypeDef wr_sr12(QSPI_HandleTypeDef *h, uint8_t sr1,
-                                 uint8_t sr2) {
-  uint8_t buf[2] = {sr1, sr2};
-  return qspi_cmd(h, CMD_WRSR, QSPI_ADDRESS_NONE, QSPI_DATA_1_LINE, 0, 0, buf,
-                  2, false);
-}
+// ================= Resize → NCHW + Gray ==================
+static void
+resize_rgb565_to_96x96_rgbNCHW_and_gray_NEAREST(const uint8_t *src, int sw,
+                                                int sh, float *__restrict dst_f,
+                                                uint8_t *__restrict dst_gray) {
+  const float sx = (float)sw / (float)W;
+  const float sy = (float)sh / (float)H;
+  const float inv255 = 1.0f / 255.0f;
 
-static HAL_StatusTypeDef wait_wip_clear(QSPI_HandleTypeDef *h,
-                                        uint32_t timeout_ms) {
-  uint32_t t0 = millis();
-  for (;;) {
-    uint8_t sr1 = 0;
-    if (rd_sr(h, CMD_RDSR1, &sr1) != HAL_OK)
-      return HAL_ERROR;
-    if ((sr1 & 0x01) == 0)
-      return HAL_OK;
-    if ((millis() - t0) > timeout_ms)
-      return HAL_TIMEOUT;
-    delay(1);
+  const int plane = (int)(H * W);
+  float *__restrict dstR = dst_f + 0 * plane;
+  float *__restrict dstG = dst_f + 1 * plane;
+  float *__restrict dstB = dst_f + 2 * plane;
+
+  for (int y = 0; y < (int)H; ++y) {
+    int ys = clampi((int)floorf((y + 0.5f) * sy), 0, sh - 1);
+    for (int x = 0; x < (int)W; ++x) {
+      int xs = clampi((int)floorf((x + 0.5f) * sx), 0, sw - 1);
+      int si = ys * sw + xs;
+
+      uint16_t v = RGB565_IS_MSB_FIRST ? load_rgb565_BE(src, si)
+                                       : load_rgb565_LE(src, si);
+      uint8_t r, g, b;
+      rgb565_to_rgb888_u16(v, r, g, b);
+
+      const int di = y * W + x;
+      dstR[di] = ((float)r - 123.675f) / 58.395f;
+      dstG[di] = ((float)g - 116.28f) / 57.12f;
+      dstB[di] = ((float)b - 103.53f) / 57.375f;
+
+      dst_gray[di] = clamp_u8(0.299f * r + 0.587f * g + 0.114f * b);
+    }
   }
 }
-static HAL_StatusTypeDef enable_quad(QSPI_HandleTypeDef *h) {
-  uint8_t sr1 = 0, sr2 = 0;
-  if (rd_sr(h, CMD_RDSR1, &sr1) != HAL_OK)
-    return HAL_ERROR;
-  if (rd_sr(h, CMD_RDSR2, &sr2) != HAL_OK)
-    return HAL_ERROR;
-  if (sr2 & 0x02)
-    return HAL_OK; // QE already 1
-  if (wren(h) != HAL_OK)
-    return HAL_ERROR;
-  sr2 |= 0x02;
-  if (wr_sr12(h, sr1, sr2) != HAL_OK)
-    return HAL_ERROR;
-  if (wait_wip_clear(h, 500) != HAL_OK)
-    return HAL_ERROR;
-  if (rd_sr(h, CMD_RDSR2, &sr2) != HAL_OK)
-    return HAL_ERROR;
-  return (sr2 & 0x02) ? HAL_OK : HAL_ERROR;
-}
 
-static HAL_StatusTypeDef qspi_enter_mmap(QSPI_HandleTypeDef *h) {
-  QSPI_CommandTypeDef c = {0};
-  c.InstructionMode = QSPI_INSTRUCTION_1_LINE;
-  c.Instruction = CMD_READ_QO; // 0x6B
-  c.AddressMode = QSPI_ADDRESS_1_LINE;
-  c.AddressSize = QSPI_ADDRESS_24_BITS;
-  c.Address = 0x000000;
-  c.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
-  c.DataMode = QSPI_DATA_4_LINES;
-  c.DummyCycles = 8;
-#ifdef QSPI_DDR_MODE_DISABLE
-  c.DdrMode = QSPI_DDR_MODE_DISABLE;
-  c.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;
-#endif
-#ifdef QSPI_SIOO_INST_EVERY_CMD
-  c.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;
-#endif
-  QSPI_MemoryMappedTypeDef mm = {0};
-  mm.TimeOutActivation = QSPI_TIMEOUT_COUNTER_DISABLE;
-  mm.TimeOutPeriod = 0;
-  return HAL_QSPI_MemoryMapped(h, &c, &mm);
-}
-
-// ---- Predict demo ----
-#ifndef ZANT_OUTPUT_LEN
-#define ZANT_OUTPUT_LEN 64 // <<<<<<<<<<<<<<<< ensure it is correct !!
-#endif
-static const int OUT_LEN = ZANT_OUTPUT_LEN;
-static const uint32_t IN_N = 1, IN_C = 3, IN_H = 10,
-                      IN_W = 10; // <<<<<<<<<<<<<<<< ensure it is correct !!
-static const uint32_t IN_SIZE = IN_N * IN_C * IN_H * IN_W;
-static float inputData[IN_SIZE];
-static uint32_t inputShape[4] = {IN_N, IN_C, IN_H, IN_W};
-
-static void printOutput(const float *out, int len) {
-  if (!out || len <= 0) {
-    Serial.println("Output nullo");
-    return;
+// ================= softmax + top1 ==================
+static void softmax_vec(const float *in, int n, float *out) {
+  float m = -INFINITY;
+  for (int i = 0; i < n; ++i)
+    if (isfinite(in[i]) && in[i] > m)
+      m = in[i];
+  float s = 0.f;
+  for (int i = 0; i < n; ++i) {
+    float z = isfinite(in[i]) ? (in[i] - m) : -50.f;
+    float e = expf(z);
+    out[i] = e;
+    s += e;
   }
-  Serial.println("=== Output ===");
-  for (int i = 0; i < len; ++i) {
-    Serial.print("out[");
-    Serial.print(i);
-    Serial.print("] = ");
-    Serial.println(out[i], 6);
+  if (s <= 0.f) {
+    float u = 1.0f / (float)n;
+    for (int i = 0; i < n; ++i)
+      out[i] = u;
+  } else {
+    float inv = 1.0f / s;
+    for (int i = 0; i < n; ++i)
+      out[i] *= inv;
   }
-  Serial.println("==============");
+}
+static inline void top1(const float *p, int n, int *idx, float *val) {
+  int k = 0;
+  float b = -1.f;
+  for (int i = 0; i < n; ++i) {
+    if (p[i] > b) {
+      b = p[i];
+      k = i;
+    }
+  }
+  *idx = k;
+  *val = b;
 }
 
-unsigned int count = 0;
+// ================= CRC32 ==================
+static uint32_t crc32_arduino(const uint8_t *data, size_t len) {
+  uint32_t crc = 0xFFFFFFFFu;
+  for (size_t i = 0; i < len; ++i) {
+    crc ^= (uint32_t)data[i];
+    for (int b = 0; b < 8; ++b) {
+      if (crc & 1u)
+        crc = (crc >> 1) ^ 0xEDB88320u;
+      else
+        crc >>= 1;
+    }
+  }
+  return ~crc;
+}
 
-// State Machine
-TrackDrinkingMovingSM sm;
+// ================= Serial frame ==================
+static const uint8_t MAGIC[4] = {'F', 'R', 'M', 'E'};
+static uint16_t g_seq = 0;
 
+static inline void put_le16(uint8_t *p, uint16_t v) {
+  p[0] = (uint8_t)(v & 0xFF);
+  p[1] = (uint8_t)(v >> 8);
+}
+static inline void put_le32(uint8_t *p, uint32_t v) {
+  p[0] = (uint8_t)(v & 0xFF);
+  p[1] = (uint8_t)((v >> 8) & 0xFF);
+  p[2] = (uint8_t)((v >> 16) & 0xFF);
+  p[3] = (uint8_t)((v >> 24) & 0xFF);
+}
+
+static void send_frame_gray_FRME(uint16_t w, uint16_t h, uint8_t cls,
+                                 uint16_t prob_x1000, uint16_t ms_x10,
+                                 const uint8_t *gray) {
+  const uint32_t payload_len = (uint32_t)w * (uint32_t)h;
+  const uint32_t crc = crc32_arduino(gray, payload_len);
+
+  uint8_t hdr[20];
+  memcpy(hdr, MAGIC, 4);
+  hdr[4] = 1; // version
+  put_le16(&hdr[5], g_seq);
+  put_le16(&hdr[7], w);
+  put_le16(&hdr[9], h);
+  hdr[11] = cls;
+  put_le16(&hdr[12], prob_x1000);
+  put_le16(&hdr[14], ms_x10);
+  put_le32(&hdr[16], payload_len);
+
+  Serial.write(hdr, sizeof(hdr));
+  Serial.write(gray, payload_len);
+
+  uint8_t cbuf[4];
+  put_le32(cbuf, crc);
+  Serial.write(cbuf, 4);
+
+  g_seq++;
+}
+
+// ================= Setup ==================
 void setup() {
-  Serial.begin(115200);
-  uint32_t t0 = millis();
-  while (!Serial && (millis() - t0) < 4000)
-    delay(10);
-  Serial.println("\n== Nicla Vision QSPI XIP (HAL) + predict ==");
+  pinMode(LEDR, OUTPUT);
+  pinMode(LEDG, OUTPUT);
+  pinMode(LEDB, OUTPUT);
+  digitalWrite(LEDR, LOW);
+  digitalWrite(LEDG, LOW);
+  digitalWrite(LEDB, LOW);
 
-  if (qspi_init_16mb(&hqspi) != HAL_OK) {
-    Serial.println("QSPI init FAIL");
-    for (;;) {
-    }
-  }
-  if (enable_quad(&hqspi) != HAL_OK) {
-    Serial.println("Enable QE FAIL");
-    for (;;) {
-    }
-  }
-  if (qspi_enter_mmap(&hqspi) != HAL_OK) {
-    Serial.println("XIP FAIL");
-    for (;;) {
-    }
+  if (!IMU.begin()) {
+    Serial.println("Failed to initialize IMU!");
+
+    while (1)
+      ;
   }
 
-  // Prepare NCHW input (simple constant pattern per channel)
-  for (uint32_t c = 0; c < IN_C; ++c)
-    for (uint32_t h = 0; h < IN_H; ++h)
-      for (uint32_t w = 0; w < IN_W; ++w) {
-        uint32_t idx = c * (IN_H * IN_W) + h * IN_W + w;
-        inputData[idx] = (c == 0) ? 0.8f : (c == 1 ? 0.5f : 0.2f);
+  Serial.print("Accelerometer sample rate = ");
+  Serial.print(IMU.accelerationSampleRate());
+  Serial.println(" Hz");
+  Serial.println();
+  Serial.println("Acceleration in g's");
+  Serial.println("X\tY\tZ");
+
+  BLE.begin();
+  BLE.setLocalName("MoodSip");
+  BLE.setAdvertisedService(grayService);
+  grayService.addCharacteristic(grayChar);
+  grayService.addCharacteristic(commandChar);
+  BLE.addService(grayService);
+  BLE.advertise();
+
+  // ✅ Sposta qui gli handler di evento
+  BLE.setEventHandler(BLEConnected, onBleConnect);
+  BLE.setEventHandler(BLEDisconnected, onBleDisconnect);
+
+  BLE.advertise();
+
+  Serial.begin(BAUD);
+  while (Serial.available())
+    Serial.read();
+
+  if (setLogFunction) {
+    if (STREAM_TO_PC)
+      setLogFunction([](char *) {}); // silenzioso
+    else
+      setLogFunction([](char *msg) {
+        Serial.print("[ZANT] ");
+        if (msg)
+          Serial.println(msg);
+        else
+          Serial.println("(null)");
+      });
+  }
+
+  // ---- Camera ----
+  cam.begin(CAMERA_R320x240, CAMERA_RGB565, 30);
+  Serial.println("[ZANT] Ready (NCHW 1x3x96x96, normalized 0..1).");
+}
+
+// ================= Loop ==================
+void loop() {
+  BLE.poll(); // processa BLE sempre
+  if (!isBleConnected) {
+    delay(100); // piccola pausa per non sovraccaricare
+    return;
+  } else {
+
+    // ================== GESTIONE BLE ==================
+    if (bleState == WAIT_CMD) {
+      BLE.poll(); // importante per non bloccare lo stack BLE
+
+      if (commandChar.written()) {
+        uint8_t cmd = commandChar.value()[0];
+
+        if (cmd == 1) {
+          // conferma presenza umana → LED rosso acceso brevemente
+          digitalWrite(LEDR, HIGH);
+          delay(300); // lampeggio visibile
+          dynamicTimer =
+              max(300000UL, dynamicTimer - 300000UL); // -5 min, minimo 5 min
+          digitalWrite(LEDR, LOW);
+        } else {
+          // comando 0 → nessuna azione, resta spento
+          digitalWrite(LEDR, LOW);
+        }
+
+        // resetta stato e riprende il ciclo
+        commandChar.setValue(0);
+        bleState = IDLE;
+        clsWaiting = -1;
       }
 
-  Serial.println("Initial state: " + sm.stateToString());
+      // ✅ ritorna al loop normale solo se non c'è comando ancora
+      return;
+    }
 
-  if (sm.startDrinking())
-    Serial.println("Moved to DRINKING");
-  else
-    Serial.println("Failed to start drinking");
+    if (cam.grabFrame(fb, 3000) != 0) {
+      Serial.println("[ZANT] camera timeout");
+      delay(5);
+      return;
+    }
 
-  Serial.println("Current state: " + sm.stateToString());
+    const uint8_t *buf = fb.getBuffer();
+    resize_rgb565_to_96x96_rgbNCHW_and_gray_NEAREST(buf, 320, 240, gInput,
+                                                    gGray8);
 
-  if (sm.startMoving())
-    Serial.println("Moved to MOVING");
-  else
-    Serial.println("Cannot start moving while drinking");
+    // Inference
+    float *out_raw = nullptr;
+    unsigned long t0 = micros();
+    int rc = predict(gInput, inputShape, 4, &out_raw);
+    unsigned long t1 = micros();
+    float ms_f = (t1 - t0) / 1000.0f;
+    uint16_t ms_x10 = (uint16_t)(ms_f * 10.0f + 0.5f);
 
-  sm.stopDrinking(); // back to TRACK
-  Serial.println("Back to TRACK: " + sm.stateToString());
+    if (rc != 0 || !out_raw) {
+      Serial.print("[ZANT] predict() rc=");
+      Serial.println(rc);
+      delay(5);
+      return;
+    }
 
-  sm.startMoving(); // now legal
-  Serial.println("Now MOVING: " + sm.stateToString());
-}
+    // ================= Predizione ==================
+    static float p80[CLASSES];
+    static int cls;
+    static float prob;
+    static uint16_t prob_x1000;
 
-void loop() {
-  // Perform inference
-  float *out = nullptr;
-  Serial.print("[Predict] Calling predict() [");
-  Serial.print(count);
-  Serial.println("]...");
-  int rc = -3;
-  unsigned long average_sum = 0;
+    softmax_vec(out_raw, (int)CLASSES, p80);
+    top1(p80, (int)CLASSES, &cls, &prob);
+    prob = fmaxf(0.f, fminf(1.f, prob));
+    prob_x1000 = (uint16_t)lrintf(prob * 1000.f);
 
-  for (uint32_t i = 0; i < 10; i++) {
-    unsigned long t_us0 = micros();
-    rc = predict(inputData, inputShape, 4, &out);
-    unsigned long t_us1 = micros();
-    average_sum = average_sum + t_us1 - t_us0;
-    if (rc != 0)
-      break;
+    digitalWrite(LEDG, (prob >= THR) ? HIGH : LOW);
+
+    if (STREAM_TO_PC)
+      send_frame_gray_FRME(W, H, (uint8_t)cls, prob_x1000, ms_x10, gGray8);
+    else {
+      Serial.print("[ZANT] cls=");
+      Serial.print(cls);
+      Serial.print(" prob=");
+      Serial.println(prob, 3);
+      Serial.print(" time=");
+      Serial.print(ms_f, 1);
+      Serial.println(" ms");
+    }
+
+    // ================= BLE ==================
+    if (cls == 1) {
+      digitalWrite(LEDR, LOW);
+      grayChar.writeValue(gGray8, W * H);
+      clsWaiting = cls;
+      bleState = WAIT_CMD;
+    } else {
+      digitalWrite(LEDR, LOW);
+      clsWaiting = -1;
+    }
+
+    if (zant_free_result)
+      zant_free_result(out_raw);
+    out_raw = nullptr;
+
+    // ================= Temperatura ogni 60 minuti ==================
+    unsigned long now = millis();
+    if (now - lastTempMillis >= TEMP_INTERVAL) {
+      lastTempMillis = now;
+
+      if (IMU.temperatureAvailable()) {
+        int temperature_int = 0;
+        float temperature_float = 0;
+        IMU.readTemperature(temperature_int);
+        IMU.readTemperatureFloat(temperature_float);
+
+        Serial.print("LSM6DSOX Temperature = ");
+        Serial.print(temperature_int);
+        Serial.print(" (");
+        Serial.print(temperature_float);
+        Serial.print(")");
+        Serial.println(" °C");
+      }
+      if (temperature > 28.0) {
+        dynamicTimer =
+            max(600000UL, dynamicTimer - 600000UL); // -10 min, minimo 10 min
+        Serial.println("[TIMER] Temperatura > 28°C → -10 min");
+      }
+
+      float ax, ay, az;
+
+      if (IMU.accelerationAvailable()) {
+        IMU.readAcceleration(ax, ay, az);
+
+        Serial.print(ax);
+        Serial.print('\t');
+        Serial.print(ay);
+        Serial.print('\t');
+        Serial.println(az);
+      }
+
+      // Accelerazione diversa da 9.81 → misura durata e aumenta timer
+      float accelMag =
+          sqrt(ax * ax + ay * ay + az * az); // modulo accelerazione
+      if (fabs(accelMag - 9.81) > 0.5) { // soglia ±0.5g per rilevare movimento
+        unsigned long increment = elapsed * 5; // aumenta di tempo_trascorso * 5
+        dynamicTimer += increment;
+        Serial.print("[TIMER] Movimento durato ");
+        Serial.print(elapsed / 1000.0);
+        Serial.print("s → +");
+        Serial.print(increment / 60000.0);
+        Serial.println(" min");
+      }
+    }
+
+    // Decrescita naturale del timer (ogni ciclo)
+    unsigned long nowTimer = millis();
+    if (nowTimer - lastTimerUpdate >= 1000) { // ogni secondo
+      lastTimerUpdate = nowTimer;
+      if (dynamicTimer > 0)
+        dynamicTimer -= 1000; // -1s
+    }
+
+    // ================= TIMER SCADUTO ==================
+    if ((long)dynamicTimer <= 0) {
+      Serial.println("[TIMER] Scaduto! LED blu acceso per 10 secondi.");
+
+      digitalWrite(LEDB, HIGH);
+      delay(10000); // 10 secondi
+      digitalWrite(LEDB, LOW);
+
+      // reset timer al valore base (es. 60 minuti)
+      dynamicTimer = baseTimer;
+      Serial.println("[TIMER] Timer resettato a 60 minuti.");
+    }
   }
-
-  Serial.print("[Predict] rc=");
-  Serial.println(rc);
-  Serial.print("[Predict] us=");
-  Serial.println((unsigned long)(average_sum / 10));
-  if (rc == 0 && out) {
-    printOutput(out, OUT_LEN);
-  } else {
-    Serial.println("[Predict] FAIL");
-  }
-  count = count + 1;
-  delay(10000);
 }
