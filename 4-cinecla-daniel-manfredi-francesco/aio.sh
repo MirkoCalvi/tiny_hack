@@ -53,26 +53,26 @@ docker run -it \
     bash -c "
         cd /workspace &&
         zig build lib-gen \
-            -Dmodel=\"beer\" \
+            -Dmodel=\"cinecla_quant\" \
             -Dxip=true \
             -Ddo_export \
             -Ddynamic \
             -Dfuse \
             -Denable_user_tests &&
         zig build lib-test \
-            -Dmodel=\"beer\" \
+            -Dmodel=\"cinecla_quant\" \
             -Dxip=true \
             -Ddo_export \
             -Ddynamic \
             -Denable_user_tests &&
         zig build lib \
-            -Dmodel=\"beer\" \
+            -Dmodel=\"cinecla_quant\" \
             -Dtarget=thumb-freestanding \
             -Dcpu=cortex_m7 \
             -Dxip=true \
             -freference-trace \
             -Doptimize=ReleaseFast &&
-        cp zig-out/beer/libzant.a /home/user/Arduino/libraries/ZantLib/src/cortex-m7/libzant.a &&
+        cp zig-out/cinecla_quant/libzant.a /home/user/Arduino/libraries/ZantLib/src/cortex-m7/libzant.a &&
         echo 'Library built and copied to ~/Arduino/libraries/ZantLib/src/cortex-m7/libzant.a'
     "
 
