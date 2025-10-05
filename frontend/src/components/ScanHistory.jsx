@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { History, CheckCircle, XCircle, AlertTriangle, Calendar, TrendingUp, Filter } from 'lucide-react';
+import { History, CheckCircle, XCircle, AlertTriangle, TrendingUp, Filter } from 'lucide-react';
 import {getAllScans} from "../API.js";
 
 export default function ScanHistoryPage() {
@@ -11,11 +11,122 @@ export default function ScanHistoryPage() {
 
         const fetchAllScans = async () => {
             const allScans = await getAllScans();
-            setScanHistory(allScans);
+            setScanHistory(allScans.items || []);
         }
 
         fetchAllScans();
     }, []);
+
+    const mushroomClasses = [
+        "Agaricus bisporus",
+        "Agaricus subrufescens",
+        "Amanita bisporigera",
+        "Amanita muscaria",
+        "Amanita ocreata",
+        "Amanita phalloides",
+        "Amanita smithiana",
+        "Amanita verna",
+        "Amanita virosa",
+        "Auricularia auricula-judae",
+        "Boletus edulis",
+        "Cantharellus cibarius",
+        "Clitocybe dealbata",
+        "Conocybe filaris",
+        "Coprinus comatus",
+        "Cordyceps sinensis",
+        "Cortinarius rubellus",
+        "Entoloma sinuatum",
+        "Flammulina velutipes",
+        "Galerina marginata",
+        "Ganoderma lucidum",
+        "Grifola frondosa",
+        "Gyromitra esculenta",
+        "Hericium erinaceus",
+        "Hydnum repandum",
+        "Hypholoma fasciculare",
+        "Inocybe erubescens",
+        "Lentinula edodes",
+        "Lepiota brunneoincarnata",
+        "Macrolepiota procera",
+        "Morchella esculenta",
+        "Omphalotus olearius",
+        "Paxillus involutus",
+        "Pholiota nameko",
+        "Pleurotus citrinopileatus",
+        "Pleurotus eryngii",
+        "Pleurotus ostreatus",
+        "Psilocybe semilanceata",
+        "Rhodophyllus rhodopolius",
+        "Russula emetica",
+        "Russula virescens",
+        "Scleroderma citrinum",
+        "Suillus luteus",
+        "Tremella fuciformis",
+        "Tricholoma matsutake",
+        "Truffles",
+        "Tuber melanosporum"
+    ];
+
+    const mushroomEdibility = {
+        "Agaricus bisporus": "edible",
+        "Agaricus subrufescens": "edible",
+        "Amanita bisporigera": "poisonous",
+        "Amanita muscaria": "poisonous",
+        "Amanita ocreata": "poisonous",
+        "Amanita phalloides": "poisonous",
+        "Amanita smithiana": "poisonous",
+        "Amanita verna": "poisonous",
+        "Amanita virosa": "poisonous",
+        "Auricularia auricula-judae": "edible",
+        "Boletus edulis": "edible",
+        "Cantharellus cibarius": "edible",
+        "Clitocybe dealbata": "poisonous",
+        "Conocybe filaris": "poisonous",
+        "Coprinus comatus": "edible",
+        "Cordyceps sinensis": "edible",
+        "Cortinarius rubellus": "poisonous",
+        "Entoloma sinuatum": "poisonous",
+        "Flammulina velutipes": "edible",
+        "Galerina marginata": "poisonous",
+        "Ganoderma lucidum": "edible",
+        "Grifola frondosa": "edible",
+        "Gyromitra esculenta": "poisonous",
+        "Hericium erinaceus": "edible",
+        "Hydnum repandum": "edible",
+        "Hypholoma fasciculare": "poisonous",
+        "Inocybe erubescens": "poisonous",
+        "Lentinula edodes": "edible",
+        "Lepiota brunneoincarnata": "poisonous",
+        "Macrolepiota procera": "edible",
+        "Morchella esculenta": "edible",
+        "Omphalotus olearius": "poisonous",
+        "Paxillus involutus": "poisonous",
+        "Pholiota nameko": "edible",
+        "Pleurotus citrinopileatus": "edible",
+        "Pleurotus eryngii": "edible",
+        "Pleurotus ostreatus": "edible",
+        "Psilocybe semilanceata": "poisonous",
+        "Rhodophyllus rhodopolius": "poisonous",
+        "Russula emetica": "poisonous",
+        "Russula virescens": "edible",
+        "Scleroderma citrinum": "poisonous",
+        "Suillus luteus": "edible",
+        "Tremella fuciformis": "edible",
+        "Tricholoma matsutake": "edible",
+        "Truffles": "edible",
+        "Tuber melanosporum": "edible"
+    };
+
+    function getEdibilityByIndex(index) {
+        if (index < 0 || index >= mushroomClasses.length) {
+            return { error: "Invalid class index" };
+        }
+        const species = mushroomClasses[index];
+        return {
+            species,
+            edibility: mushroomEdibility[species] || "unknown"
+        };
+    }
 
     const getEdibilityBadge = (edibility) => {
         const config = {
@@ -59,43 +170,7 @@ export default function ScanHistoryPage() {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-600">Total Scans</p>
-                                <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white/95 backdrop-blur-lg rounded-xl shadow-lg p-4">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-green-100 p-3 rounded-lg">
-                                <CheckCircle size={24} className="text-green-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600">Edible</p>
-                                <p className="text-2xl font-bold text-gray-800">{stats.edible}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white/95 backdrop-blur-lg rounded-xl shadow-lg p-4">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-red-100 p-3 rounded-lg">
-                                <XCircle size={24} className="text-red-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600">Toxic</p>
-                                <p className="text-2xl font-bold text-gray-800">{stats.toxic}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white/95 backdrop-blur-lg rounded-xl shadow-lg p-4">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-yellow-100 p-3 rounded-lg">
-                                <AlertTriangle size={24} className="text-yellow-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600">Unknown</p>
-                                <p className="text-2xl font-bold text-gray-800">{stats.unknown}</p>
+                                <p className="text-2xl font-bold text-gray-800">{scanHistory.length}</p>
                             </div>
                         </div>
                     </div>
@@ -166,7 +241,7 @@ export default function ScanHistoryPage() {
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            {Object.entries(scanHistory.items).map((scan) => (
+                            {scanHistory.map((scan, index) => (
                                 <div key={scan.id} className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-6">
                                     <div className="space-y-4">
                                         <div key={scan.id} className="border-b border-gray-200 pb-4 last:border-b-0">
@@ -182,7 +257,7 @@ export default function ScanHistoryPage() {
                                                             <h5 className="text-xl font-bold text-gray-800">{scan.commonName}</h5>
                                                             <p className="text-gray-600 italic text-sm">{scan.mushroomName}</p>
                                                         </div>
-                                                        {getEdibilityBadge(scan.edibility)}
+                                                        {getEdibilityByIndex(scan.class).edibility}
                                                     </div>
                                                     <div className="flex gap-4 flex-wrap text-sm text-gray-600">
                                                             <span>
