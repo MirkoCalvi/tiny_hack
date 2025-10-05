@@ -40,3 +40,13 @@ debug.log*
 
 # Local files
 *.local
+
+# Mac system files
+.DS_Store
+
+# Python cache
+__pycache__/
+
+# venv
+.venv
+/Z-Ant/examples/tiny_hack/images/*
