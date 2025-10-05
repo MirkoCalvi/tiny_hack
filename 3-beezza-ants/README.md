@@ -10,7 +10,9 @@ This project was started during the [Tiny_Hack_v1](https://luma.com/59rubmuv) by
 - [Gianfranco Poncini](https://github.com/Muwattalli)
 - [Alberto Castronovo](https://github.com/albertocastronovo)
 
-For the detailed rules of the Tiny_Hack_v1 Hackathon please read [here](README.md).
+<!-- For the detailed rules of the Tiny_Hack_v1 Hackathon please read [here](README.md). -->
+
+[BeezzaAnts Presentation to Tiny_Hack_v1](slides/BeezzaAnts-presentation.pdf)
 
 ## Project Description
 
@@ -33,6 +35,13 @@ Whether you're running a busy pizzeria or a cozy neighborhood joint, BeezzaAnts 
 ### Why the Name?
 
 Just like a **swarm of bees and ants**, BeezzaAnts works tirelessly and collectively to analyze, inspect, and report — with the speed and precision your pizza deserves. And yes, _we also_ love pizza way too much.
+
+## Project Documentation
+
+Please see the [docs](docs/) folder. More specifically:
+
+- [BeezzaAnts - System Architecture](docs/beezzaants-system-architecture.md)
+- [BeezzaAnts - HOWTO Deploy the Software](docs/beezzaants-system-architecture.md)
 
 ## Copyright and license
 
