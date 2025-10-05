@@ -12,7 +12,7 @@ This project was started during the [Tiny_Hack_v1](https://luma.com/59rubmuv) by
 
 <!-- For the detailed rules of the Tiny_Hack_v1 Hackathon please read [here](README.md). -->
 
-[BeezzaAnts Presentation to Tiny_Hack_v1](slides/BeezzaAnts-presentation.pdf)
+[BeezzaAnts Presentation to Tiny_Hack_v1](slides/beezzaants_presentation.pdf)
 
 ## Project Description
 
