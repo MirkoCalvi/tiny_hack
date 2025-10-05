@@ -7,9 +7,9 @@ import plotly.graph_objects as go
 
 def create_empty_time_series_dataframe() -> "pd.DataFrame":
     """
-    Crea e restituisce un DataFrame vuoto per rappresentare una serie temporale.
-    Questo DataFrame viene utilizzato quando non ci sono dati disponibili da mostrare nel grafico.
-    Le colonne includono: Time (timestamp), Distance (mm) (distanza in millimetri), color (colore per il grafico).
+    Create and return an empty DataFrame that represents a time series.
+    Used whenever there is no data to display on the chart.
+    Columns include: Time (timestamp), Distance (mm), color (plot colour).
     """
     return pd.DataFrame({
         "Time": pd.to_datetime([], unit="s"),
@@ -19,8 +19,8 @@ def create_empty_time_series_dataframe() -> "pd.DataFrame":
 
 def generate_fake_statistics():
     """
-    Genera dati fittizi per le statistiche del quadro monitorato.
-    Ritorna un dizionario con visite giornaliere e mensili e dati per i grafici.
+    Generate fake statistics for the monitored artwork.
+    Return a dictionary with daily and monthly visit counts plus chart data.
     """
     # Fake counts
     visits_today = np.random.randint(50, 150)
@@ -45,14 +45,14 @@ def generate_fake_statistics():
 
 def plot_visits_time_series(x, y, title):
     """
-    Crea un grafico a linee per le visite nel tempo utilizzando Plotly.
+    Create a Plotly line chart that displays visits over time.
     """
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, y=y, mode='lines+markers', name='Visite'))
+    fig.add_trace(go.Scatter(x=x, y=y, mode='lines+markers', name='Visits'))
     fig.update_layout(
         title=title,
-        xaxis_title="Tempo",
-        yaxis_title="Visite",
+        xaxis_title="Time",
+        yaxis_title="Visits",
         template="plotly_white",
         height=400
     )
@@ -60,17 +60,20 @@ def plot_visits_time_series(x, y, title):
 
 def create_interface_layout():
     """
-    Crea e restituisce il layout completo dell'interfaccia utente utilizzando Gradio.
-    Il layout è organizzato in schede (tabs) per mostrare il monitoraggio e le statistiche.
+    Build and return the complete Gradio user interface layout.
+    Tabs organise the live monitoring view and the statistics view.
     """
     with gr.Tabs() as tabs:
-        with gr.TabItem("Monitoraggio Attuale"):
+        with gr.TabItem("Live Monitoring"):
             with gr.Row():
                 with gr.Column(scale=2):
-                    status_summary_markdown = gr.Markdown("⏳ Avvio in corso...")
+                    status_summary_markdown = gr.Markdown(
+                        "<div class=\"status-summary-content empty\"><p>⏳ Starting up...</p></div>",
+                        elem_classes=["status-summary"],
+                    )
                 with gr.Column(scale=1):
                     camera_selection_dropdown = gr.Dropdown(
-                        label="Seleziona Telecamera",
+                        label="Select Camera",
                         choices=[],
                         value=None
                     )
@@ -79,37 +82,40 @@ def create_interface_layout():
                         maximum=1000,
                         value=100,
                         step=10,
-                        label="Distanza Sicura (mm)"
+                        label="Safe Distance (mm)"
                     )
-                    fomo_box = gr.Markdown("### 👁️‍🗨️ Nicla-02 FOMO\n_in attesa di linee dalla seriale…_")
+                    fomo_box = gr.Markdown(
+                        "### 👁️‍🗨️ Nicla-02 FOMO\n_waiting for serial data..._",
+                        elem_classes=["status-fomo"],
+                    )
                     with gr.Row():
                         pass
 
             current_status_data_table = gr.Dataframe(
-                label="📊 Stato Attuale Telecamere",
+                label="📊 Current Camera Status",
                 interactive=False
             )
 
             distance_over_time_plot = gr.Plot(
                 value=None,
-                label="Distanza (ToF) — Ultimi Minuti"
+                label="Distance (ToF) — Last Few Minutes"
             )
 
             alarm_events_data_table = gr.Dataframe(
-                headers=["tempo", "id_telecamera", "evento", "valore"],
+                headers=["time", "camera_id", "event", "value"],
                 interactive=False
             )
 
-            last_packet_debug_json = gr.JSON(label="Ultimo Pacchetto (Debug)")
+            last_packet_debug_json = gr.JSON(label="Last Packet (Debug)")
 
-        with gr.TabItem("Statistiche Quadro"):
+        with gr.TabItem("Artwork Statistics"):
             stats = generate_fake_statistics()
 
-            visits_today_md = gr.Markdown(f"### Visite Oggi: {stats['visits_today']}")
-            visits_month_md = gr.Markdown(f"### Visite Questo Mese: {stats['visits_month']}")
+            visits_today_md = gr.Markdown(f"### Visits Today: {stats['visits_today']}")
+            visits_month_md = gr.Markdown(f"### Visits This Month: {stats['visits_month']}")
 
-            visits_today_plot = gr.Plot(value=plot_visits_time_series(stats['hours'], stats['visits_per_hour'], "Visite per Ora (Oggi)"), label="Visite per Ora (Oggi)")
-            visits_month_plot = gr.Plot(value=plot_visits_time_series(stats['days'], stats['visits_per_day'], "Visite per Giorno (Mese)"), label="Visite per Giorno (Mese)")
+            visits_today_plot = gr.Plot(value=plot_visits_time_series(stats['hours'], stats['visits_per_hour'], "Visits per Hour (Today)"), label="Visits per Hour (Today)")
+            visits_month_plot = gr.Plot(value=plot_visits_time_series(stats['days'], stats['visits_per_day'], "Visits per Day (Month)"), label="Visits per Day (Month)")
 
     return {
         "status_summary_markdown": status_summary_markdown,

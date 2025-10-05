@@ -4,7 +4,7 @@ import sys
 import threading
 import gradio as gr
 
-# Aggiunge il percorso corrente per importare moduli locali
+# Add the current path so we can import local modules
 sys.path.insert(0, '.')
 
 from core.config import load_configuration
@@ -14,24 +14,122 @@ from ui.components import create_interface_layout
 from ui.update import snapshot_state
 from core.state import clear_all_data
 
+CUSTOM_CSS = """
+.status-summary {
+    display: flex;
+    justify-content: center;
+}
+
+.status-summary .status-summary-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.status-summary .status-item {
+    max-width: 720px;
+    width: 100%;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background: var(--block-background-fill);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.status-summary .status-camera {
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.status-summary .status-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.25rem 2rem;
+}
+
+.status-summary .status-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 120px;
+}
+
+.status-summary .metric-label {
+    font-size: 0.95rem;
+    color: var(--body-text-color-subdued, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.status-summary .metric-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--body-text-color, #111);
+}
+
+.status-summary .metric-value.metric-highlight {
+    font-size: 2.1rem;
+}
+
+.status-summary .metric-value.metric-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.status-summary .metric-value.zone-safe {
+    background: rgba(46, 204, 113, 0.15);
+    color: #1e8449;
+}
+
+.status-summary .metric-value.zone-alert {
+    background: rgba(231, 76, 60, 0.2);
+    color: #c0392b;
+}
+
+.status-summary .status-summary-content.empty {
+    padding: 2rem;
+    font-size: 1.3rem;
+    text-align: center;
+    opacity: 0.8;
+}
+
+.status-summary .status-summary-content.empty p {
+    margin: 0;
+}
+
+.status-fomo .markdown-body {
+    text-align: center;
+}
+"""
+
 def main():
     """
-    Funzione principale dell'applicazione dashboard MuseINO.
-    Questa funzione coordina l'avvio completo dell'applicazione:
-    - Carica le impostazioni di configurazione.
-    - Resetta tutti i dati precedenti per un avvio pulito.
-    - Avvia un thread separato per ricevere dati UDP dalle telecamere.
-    - Costruisce l'interfaccia utente con Gradio.
-    - Avvia il server web per l'accesso alla dashboard.
+    Main entry point for the MuseINO dashboard application.
+    This function coordinates the entire startup sequence:
+    - Load the configuration settings.
+    - Reset any previous run data for a clean start.
+    - Spawn a background thread to receive UDP data from the cameras.
+    - Build the Gradio user interface.
+    - Launch the web server that exposes the dashboard.
     """
-    # Carica le impostazioni dal file di configurazione
+    # Load settings from the configuration source
     configuration = load_configuration()
 
-    # Resetta tutte le strutture dati globali per evitare residui da esecuzioni precedenti
+    # Clear all global data structures to avoid leftovers from previous runs
     clear_all_data()
 
-    # Avvia un thread in background per ascoltare continuamente i pacchetti UDP inviati dalle telecamere
-    # Questo thread lavora in parallelo senza bloccare l'interfaccia utente
+    # Start a background thread that continuously listens for UDP packets from the cameras
+    # The thread runs in parallel without blocking the user interface
     threading.Thread(
         target=udp_listener,
         kwargs={
@@ -41,26 +139,26 @@ def main():
             "hysteresis_mm": configuration.hysteresis_mm,
             "min_dwell_seconds": configuration.min_dwell_seconds
         },
-        daemon=True  # Il thread si chiude automaticamente quando il programma principale termina
+        daemon=True  # Thread closes automatically when the main program exits
     ).start()
 
-    # Avvia un thread per leggere la seriale Nicla-02 (FOMO)
+    # Start a thread to read the Nicla-02 (FOMO) serial port
     threading.Thread(
         target=serial_reader,
         args=(configuration.nicla2_port, configuration.nicla2_baud, configuration.nicla2_cam_id),
         daemon=True
     ).start()
 
-    # Costruisce l'interfaccia utente completa utilizzando il framework Gradio
-    with gr.Blocks(title="MuseINO Dashboard", fill_height=True) as demo:
-        # Titolo principale della dashboard
-        gr.Markdown("# 🖼️ MuseINO — Dashboard per Nicla Vision")
+    # Build the full user interface using the Gradio framework
+    with gr.Blocks(title="MuseINO Dashboard", fill_height=True, css=CUSTOM_CSS) as demo:
+        # Main dashboard title
+        gr.Markdown("# 🖼️ MuseINO — Nicla Vision Dashboard")
 
-        # Crea tutti i componenti dell'interfaccia (pulsanti, grafici, tabelle, ecc.)
+        # Create every UI component (buttons, charts, tables, etc.)
         interface_components = create_interface_layout()
 
-        # Imposta un timer che aggiorna automaticamente l'interfaccia ogni secondo
-        # Questo permette di vedere i dati in tempo reale senza bisogno di refresh manuali
+        # Configure a timer that refreshes the interface every second
+        # This keeps data live without manual refreshes
         timer = gr.Timer(1.0, active=True)
         timer.tick(
             fn=lambda selected_camera, safe_distance: snapshot_state(
@@ -85,11 +183,11 @@ def main():
             ],
         )
 
-    # Avvia il server web Gradio per rendere accessibile la dashboard via browser
+    # Launch the Gradio web server to expose the dashboard in a browser
     demo.launch(
-        server_name="0.0.0.0",  # Ascolta su tutte le interfacce di rete
-        server_port=int(os.getenv("PORT", "7860")),  # Porta predefinita 7860, modificabile con variabile d'ambiente
-        allowed_paths=[configuration.export_directory],  # Permette il download di file dalla cartella di esportazione
+        server_name="0.0.0.0",  # Listen on every network interface
+        server_port=int(os.getenv("PORT", "7860")),  # Default port 7860, override via environment variable
+        allowed_paths=[configuration.export_directory],  # Allow file downloads from the export directory
     )
 
 if __name__ == "__main__":

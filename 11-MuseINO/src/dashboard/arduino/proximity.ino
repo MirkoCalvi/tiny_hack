@@ -1,8 +1,8 @@
-// nicla_people_counter_tof_fomo_udp.ino (ToF-only + fallback count senza FOMO)
+// nicla_people_counter_tof_fomo_udp.ino (ToF-only + fallback count without FOMO)
 //
-// - Soglie adattate: ENTER=550 mm, EXIT=700 mm
-// - Modalità attuale: ToF-only (CONFIRM_MODE = None) -> conta sempre
-// - Fallback: se in futuro usi OnDeviceFOMO ma il modello non è pronto, conta comunque
+// - Tuned thresholds: ENTER=550 mm, EXIT=700 mm
+// - Current mode: ToF-only (CONFIRM_MODE = None) -> always count
+// - Fallback: if you enable OnDeviceFOMO later but the model is not ready, still count
 //
 // Board: Arduino Nicla Vision (Arduino Mbed OS Nicla Boards)
 
@@ -18,7 +18,7 @@
   using rtos::Thread;
   using rtos::Mutex;
 #else
-  #warning "Questo sketch usa RTOS (Mbed). Su core non-Mbed disabilita il threading."
+  #warning "This sketch uses RTOS (Mbed). On non-Mbed cores disable threading."
 #endif
 
 // ============================== CONFIG =======================================
@@ -34,19 +34,19 @@ namespace cfg {
   constexpr uint8_t  TELEMETRY_HZ = 5;
 
   enum class ConfirmMode : uint8_t { None=0, OnDeviceFOMO=1 };
-  // 🔴 Modalità corrente: SENZA FOMO → contiamo sempre con ToF
+  // 🔴 Current mode: NO FOMO -> always count with ToF
   constexpr ConfirmMode CONFIRM_MODE = ConfirmMode::None;
 
-  // Soglie e tempi (tarati sul tuo log)
-  constexpr int      ENTER_TH_MM      = 550;   // entra sotto ~55 cm
-  constexpr int      EXIT_TH_MM       = 700;   // esce sopra ~70 cm (isteresi)
+  // Thresholds and timings (calibrated from your log)
+  constexpr int      ENTER_TH_MM      = 550;   // enters below ~55 cm
+  constexpr int      EXIT_TH_MM       = 700;   // exits above ~70 cm (hysteresis)
   constexpr uint32_t ENTER_HOLD_MS    = 200;
   constexpr uint32_t EXIT_HOLD_MS     = 400;
   constexpr uint32_t MISSING_TIMEOUT  = 1500;
 
   constexpr float    EMA_ALPHA        = 0.4f;
 
-  // Parametri FOMO (lasciati per futuro uso)
+  // FOMO parameters (reserved for future use)
   constexpr uint16_t FOMO_IMG_W      = 96;
   constexpr uint16_t FOMO_IMG_H      = 96;
   constexpr uint32_t FOMO_TIMEOUT_MS = 25000;
@@ -117,14 +117,14 @@ namespace vision {
 #endif
 
   bool begin() {
-    // 🔧 Collega qui camera + runtime modello quando pronto
-    s_model_ready = false;  // oggi non usiamo FOMO
+    // 🔧 Hook up the camera + model runtime here when it is ready
+    s_model_ready = false;  // not using FOMO today
     return s_model_ready;
   }
   bool is_ready() { return s_model_ready; }
   bool is_busy()  { return s_job_running; }
 
-  // Stub per compatibilità
+  // Compatibility stub
   bool start_async_once() { return false; }
   bool poll_result(Result* out) { (void)out; return false; }
 }
@@ -182,7 +182,7 @@ namespace app {
   void tick_logic() {
     const unsigned long now = millis();
 
-    // ToF + filtro
+    // ToF + filter
     const int d = hw::read_tof_mm();
     if (d_f <= 0) d_f = (float)d;
     d_f = (1.0f - cfg::EMA_ALPHA) * d_f + cfg::EMA_ALPHA * (float)d;
@@ -197,21 +197,21 @@ namespace app {
             send_event("prox_enter", (int)d_f);
 
             if (cfg::CONFIRM_MODE == cfg::ConfirmMode::OnDeviceFOMO && vision::is_ready()) {
-              // (non usato ora) in futuro: candida e attendi FOMO
+              // Not used now: in the future queue and wait for FOMO
               sm = State::CANDIDATE;
               t_candidateStart = now;
               (void)vision::start_async_once();
             } else if (cfg::CONFIRM_MODE == cfg::ConfirmMode::OnDeviceFOMO && !vision::is_ready()) {
-              // Fallback: FOMO non pronto → conta comunque
-              Serial.println("[FOMO] Non pronto: procedo ToF-only (fallback).");
+              // Fallback: FOMO not ready -> still count
+              Serial.println("[FOMO] Not ready: continuing ToF-only (fallback).");
               sm = State::ACTIVE; t_sessionStart = now;
               send_event("fomo_skipped", (int)d_f);
-              people_count++;  // ✅ conteggio in ingresso
+              people_count++;  // ✅ increment on entry
             } else {
-              // Modalità ToF-only (corrente)
+              // ToF-only mode (current)
               sm = State::ACTIVE; t_sessionStart = now;
               send_event("auto_confirmed", (int)d_f);
-              people_count++;  // ✅ conteggio in ingresso
+              people_count++;  // ✅ increment on entry
             }
           }
         } else {
@@ -220,7 +220,7 @@ namespace app {
       } break;
 
       case State::CANDIDATE: {
-        // (non usato in ToF-only) – lasciato per futuro uso col FOMO
+        // Not used in ToF-only mode - kept for future FOMO integration
         if (d_f > 0 && d_f < cfg::ENTER_TH_MM) t_lastSeen = now;
 
         vision::Result r{};
@@ -228,7 +228,7 @@ namespace app {
           if (r.ok && r.conf >= cfg::FOMO_CONF_TH) {
             sm = State::ACTIVE; t_sessionStart = now;
             send_event("fomo_confirmed", (int)d_f, 0, r.conf);
-            people_count++; // conteggio all'avvio sessione
+            people_count++; // count at session start
           } else {
             send_event("fomo_rejected", (int)d_f, 0, r.conf);
             sm = State::IDLE;
@@ -272,7 +272,7 @@ void setup() {
   if (!hw::begin_tof()) {
     Serial.println("[TOF] VL53L1X init FAILED"); while (1) delay(1000);
   }
-  (void)vision::begin(); // oggi non usa FOMO (placeholder)
+  (void)vision::begin(); // not using FOMO today (placeholder)
 }
 
 void loop() {

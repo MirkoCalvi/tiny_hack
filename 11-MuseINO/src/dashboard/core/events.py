@@ -6,15 +6,15 @@ import sys
 from datetime import datetime
 import pandas as pd
 
-# Aggiunge il percorso per importare moduli locali
+# Add the project path so we can import local modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from core.state import get_current_timestamp, event_log, data_lock
 
 def push_event(event_type: str, camera_id: str, payload: dict):
     """
-    Aggiunge un evento al log degli eventi.
-    Utilizzato per registrare eventi come ingressi/uscite da allarme.
-    Il payload contiene dati aggiuntivi come distanza o tempo di dwell.
+    Append an event to the shared event log.
+    Used to record events such as alarm entries and exits.
+    The payload stores extra data like distance or dwell time.
     """
     with data_lock:
         event_log.append({
@@ -28,8 +28,8 @@ def push_event(event_type: str, camera_id: str, payload: dict):
 
 def to_events_dataframe(event_list: list[dict] | None = None) -> "pd.DataFrame":
     """
-    Converte la lista degli eventi in un DataFrame pandas per la visualizzazione.
-    Se event_list è None, usa il log corrente degli eventi.
+    Convert the event list into a pandas DataFrame for display.
+    If event_list is None, read from the current event log.
     """
     import pandas as pd
     if event_list is None:

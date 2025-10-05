@@ -10,7 +10,7 @@ ZANT_RE = re.compile(r"label\s*=\s*([A-Za-z0-9_]+).*?prob\s*=\s*([0-9]*\.?[0-9]+
 
 def _parse_zant_line(line: str) -> Optional[tuple[str, float]]:
     """
-    Estrae (label, prob) da una riga tipo:
+    Extract (label, prob) from a line such as:
     '[ZANT] PERSON top1: idx=1 label=not_person prob=0.926 time=1958.3 ms'
     """
     m = ZANT_RE.search(line)
@@ -25,7 +25,7 @@ def _parse_zant_line(line: str) -> Optional[tuple[str, float]]:
 
 def _push_event(ev_type: str, cam_id: str, payload: dict):
     """
-    Aggiunge un evento al log degli eventi.
+    Append an event to the shared event log.
     """
     event_log.append({
         "time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(get_current_timestamp())),
@@ -36,24 +36,24 @@ def _push_event(ev_type: str, cam_id: str, payload: dict):
 
 def serial_reader(port: str, baud: int, cam_id: str):
     """
-    Legge la seriale della Nicla FOMO e aggiorna latest_data_by_camera[cam_id]
-    con: mode='fomo', fomo_label, fomo_prob; e genera un evento 'FOMO'.
+    Read the Nicla FOMO serial port, update latest_data_by_camera[cam_id]
+    with mode='fomo', fomo_label, fomo_prob and push a 'FOMO' event.
     """
     try:
         import serial  # pyserial
     except Exception as e:
-        print(f"[SER {cam_id}] pyserial mancante: pip install pyserial ({e})")
+        print(f"[SER {cam_id}] missing pyserial: pip install pyserial ({e})")
         return
 
     while True:
         try:
             print(f"[SER {cam_id}] Opening {port} @ {baud} ...")
             with serial.Serial(port, baud, timeout=1) as ser:
-                # pulisci buffer
+                # Clear serial buffers
                 ser.reset_input_buffer()
                 ser.reset_output_buffer()
-                print(f"[SER {cam_id}] OK, in ascolto.")
-                # loop righe
+                print(f"[SER {cam_id}] OK, listening.")
+                # Iterate over lines
                 for raw in ser:
                     try:
                         line = raw.decode("utf-8", errors="ignore").strip()
@@ -62,7 +62,7 @@ def serial_reader(port: str, baud: int, cam_id: str):
                     if not line:
                         continue
 
-                    # prova a parare una riga ZANT
+                    # Try to parse a ZANT line
                     parsed = _parse_zant_line(line)
                     if not parsed:
                         continue
@@ -79,5 +79,5 @@ def serial_reader(port: str, baud: int, cam_id: str):
                         _push_event("FOMO", cam_id, {"label": label, "prob": prob})
 
         except Exception as e:
-            print(f"[SER {cam_id}] errore seriale: {e}")
+            print(f"[SER {cam_id}] serial error: {e}")
             time.sleep(2.0)  # retry
