@@ -1,0 +1,83 @@
+.container {
+  color: #fff;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.description {
+  font-size: 16px;
+  color: #888;
+  margin-bottom: 30px;
+}
+
+.emptyMessage {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.momentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.momentCard {
+  background: #0a0a0a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  transition: border-color 0.2s;
+}
+
+.momentCard:hover {
+  border-color: #3b82f6;
+}
+
+.momentTime {
+  font-size: 20px;
+  font-weight: 700;
+  color: #3b82f6;
+  min-width: 140px;
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+.momentReactions {
+  display: flex;
+  gap: 40px;
+  flex: 1;
+}
+
+.reaction {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reactionLabel {
+  font-size: 14px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.reactionEmotion {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  background: #1a1a1a;
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+

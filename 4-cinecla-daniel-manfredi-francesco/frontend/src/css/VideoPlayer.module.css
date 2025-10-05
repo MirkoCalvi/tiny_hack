@@ -1,0 +1,31 @@
+.container {
+  background: #1a1a1a;
+  border-radius: 18px;
+  padding: 30px;
+  border: 1px solid #333;
+}
+
+.wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #000;
+}
+
+.wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.player {
+  width: 100%;
+  height: 100%;
+}
+
+
+

@@ -1,0 +1,123 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+
+.card {
+  background: #1a1a1a;
+  border-radius: 18px;
+  padding: 60px;
+  max-width: 750px;
+  width: 100%;
+  border: 1px solid #333;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: 21px;
+  color: #888;
+  margin-bottom: 48px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.label {
+  font-size: 21px;
+  font-weight: 500;
+  color: #ccc;
+}
+
+.input {
+  padding: 18px 24px;
+  font-size: 21px;
+  border-radius: 12px;
+  border: 1px solid #333;
+  background: #0a0a0a;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.deviceStatus {
+  padding: 24px;
+  background: #0a0a0a;
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.deviceTitle {
+  font-size: 21px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: #ccc;
+}
+
+.device {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 21px;
+  margin-top: 6px;
+}
+
+.deviceIndicator {
+  font-size: 18px;
+}
+
+.error {
+  padding: 18px 24px;
+  background: #331111;
+  border: 1px solid #661111;
+  border-radius: 12px;
+  color: #ff6666;
+  font-size: 21px;
+}
+
+.button {
+  padding: 21px 36px;
+  font-size: 24px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  background: #3b82f6;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.button:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.button:disabled {
+  background: #333;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
