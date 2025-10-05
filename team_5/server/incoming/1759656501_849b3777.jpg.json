@@ -1,0 +1,40 @@
+{
+  "device_id": "nicla01",
+  "score": 0.72,
+  "capture_id": "1759656501_849b3777",
+  "received_at_utc": "2025-10-05T09:28:21.211791Z",
+  "original_filename": "test_lesione.jpg",
+  "content_type": "image/jpeg",
+  "content_length": 33802,
+  "stored_filename": "1759656501_849b3777.jpg",
+  "image_format": "JPEG",
+  "width": 640,
+  "height": 640,
+  "classification": "Melanocytic_nevi",
+  "category": "benign",
+  "description": "Nevi melanocitici - nei benigni da monitorare",
+  "confidence": 0.736,
+  "risk_level": "medium",
+  "priority": 3,
+  "model_version": "vit_large_patch16_384_v1",
+  "classified_at": "2025-10-05T09:28:23.330497Z",
+  "inference_provider": "SkinCancerPredictor",
+  "inference_latency_ms": 2114.67,
+  "raw_predictions": [
+    {
+      "class": "Melanocytic_nevi",
+      "friendly_name": "Melanocytic Nevi (Moles)",
+      "confidence": 0.7355337738990784
+    },
+    {
+      "class": "Melanoma",
+      "friendly_name": "Melanoma",
+      "confidence": 0.14086873829364777
+    },
+    {
+      "class": "Benign_keratosis-like_lesions",
+      "friendly_name": "Benign Keratosis-like Lesions",
+      "confidence": 0.1199059933423996
+    }
+  ]
+}

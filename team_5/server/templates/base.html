@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MelaNoMore - AI Skin Cancer Detection{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="container header-content">
+            <div class="logo-section">
+                <h1>🏥 MelaNoMore</h1>
+                <p class="subtitle">AI-Powered Dermatological Triage</p>
+            </div>
+            <nav class="main-nav">
+                <a href="{{ url_for('dashboard') }}"
+                    class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+                {# Removed API & Health links for cleaner clinical UI. Consider reintroducing via a secondary settings
+                panel if needed. #}
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; 2025 MelaNoMore | TinyHack Torino</p>
+            <p class="footer-note">For medical professional use only. Not for diagnostic purposes without clinical
+                confirmation.</p>
+        </div>
+    </footer>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

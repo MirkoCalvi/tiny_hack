@@ -1,0 +1,40 @@
+{
+  "device_id": "nicla01",
+  "score": 0.72,
+  "capture_id": "1759656560_858dd132",
+  "received_at_utc": "2025-10-05T09:29:20.140478Z",
+  "original_filename": "test_lesione.jpg",
+  "content_type": "image/jpeg",
+  "content_length": 24007,
+  "stored_filename": "1759656560_858dd132.jpg",
+  "image_format": "JPEG",
+  "width": 640,
+  "height": 640,
+  "classification": "Basal_cell_carcinoma",
+  "category": "malignant",
+  "description": "Carcinoma basocellulare - tumore cutaneo maligno",
+  "confidence": 0.807,
+  "risk_level": "critical",
+  "priority": 1,
+  "model_version": "vit_large_patch16_384_v1",
+  "classified_at": "2025-10-05T09:29:22.770677Z",
+  "inference_provider": "SkinCancerPredictor",
+  "inference_latency_ms": 2627.45,
+  "raw_predictions": [
+    {
+      "class": "Basal_cell_carcinoma",
+      "friendly_name": "Basal Cell Carcinoma",
+      "confidence": 0.806854784488678
+    },
+    {
+      "class": "Melanoma",
+      "friendly_name": "Melanoma",
+      "confidence": 0.08421781659126282
+    },
+    {
+      "class": "Benign_keratosis-like_lesions",
+      "friendly_name": "Benign Keratosis-like Lesions",
+      "confidence": 0.05418914556503296
+    }
+  ]
+}
