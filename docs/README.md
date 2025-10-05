@@ -69,6 +69,10 @@ Following the instruction from [model_example.ipynb](notebooks/model_example.ipy
 
 You can see the loss of the model and the F1 score in the picture below:
 
+F1 Score             |  Loss of the Model
+:-------------------------:|:-------------------------:
+![](https://github.com/TinyHack-Group-8/tiny_hack/blob/main/docs/imgs/classification-f1.jpeg?raw=true)  |  ![](https://github.com/TinyHack-Group-8/tiny_hack/blob/main/docs/imgs/loss.jpeg?raw=true)
+
 ### Deployment and firmware
 
 It is possible deploy the quantized model dragging the `.onnx` file inside the `src/` directory.
