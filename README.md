@@ -192,5 +192,3 @@ This project is developed for educational and research purposes.
 All rights reserved © 2025 by **Ezmiron Deniku**, **Stiven Gjinaj**, **Alberto Giunti**, and **Daniele Gagni**.
 
 ---
-
-```
