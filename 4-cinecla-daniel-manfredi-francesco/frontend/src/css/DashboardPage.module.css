@@ -1,0 +1,131 @@
+.container {
+  min-height: 100vh;
+  padding: 30px;
+  background: #0a0a0a;
+}
+
+.content {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.newButton {
+  padding: 14px 28px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  background: #3b82f6;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.newButton:hover {
+  background: #2563eb;
+}
+
+.tabsContainer {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #333;
+  padding-bottom: 2px;
+}
+
+.tabButton {
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+.tabButton:hover {
+  color: #fff;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.tabButtonActive {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
+.viewContainer {
+  background: #1a1a1a;
+  border-radius: 18px;
+  padding: 40px;
+  border: 1px solid #333;
+  min-height: 500px;
+}
+
+.viewContent {
+  color: #fff;
+}
+
+.viewContent h2 {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.viewContent p {
+  font-size: 18px;
+  color: #888;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+}
+
+.empty h1 {
+  font-size: 36px;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.empty p {
+  font-size: 18px;
+  color: #888;
+  margin-bottom: 32px;
+}
+
+.button {
+  padding: 14px 28px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  background: #3b82f6;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.button:hover {
+  background: #2563eb;
+}
+

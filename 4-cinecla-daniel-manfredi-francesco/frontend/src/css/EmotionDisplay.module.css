@@ -1,0 +1,165 @@
+.container {
+  background: #1a1a1a;
+  border-radius: 18px;
+  padding: 30px;
+  border: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ccc;
+  margin-bottom: 12px;
+}
+
+.currentEmotion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #0a0a0a;
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.emoji {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.emotionText {
+  font-size: 24px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.timeline {
+  flex: 1;
+  overflow-y: auto;
+  background: #0a0a0a;
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-size: 18px;
+}
+
+.impressionsList {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.impressionItem {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #333;
+  transition: background 0.2s;
+}
+
+.impressionItem:hover {
+  background: #252525;
+}
+
+.itemEmoji {
+  font-size: 24px;
+  text-align: center;
+}
+
+.itemEmotion {
+  font-size: 16px;
+  color: #fff;
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+.itemTimestamp {
+  font-size: 14px;
+  color: #888;
+  font-family: 'Courier New', monospace;
+}
+
+/* Scrollbar styling */
+.timeline::-webkit-scrollbar {
+  width: 8px;
+}
+
+.timeline::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timeline::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+.timeline::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Animated emojis */
+.animatedEmojisContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.fallingEmoji {
+  position: absolute;
+  font-size: 60px;
+  left: 50%;
+  top: 80px;
+  transform: translateX(-50%);
+  animation: fallAndFade 3s ease-in forwards;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes fallAndFade {
+  0% {
+    top: 80px;
+    opacity: 1;
+    transform: translateX(-50%) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translateX(-50%) scale(1.2) rotate(15deg);
+  }
+  40% {
+    transform: translateX(-50%) scale(1) rotate(-10deg);
+  }
+  60% {
+    transform: translateX(-50%) scale(1.1) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    top: 500px;
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8) rotate(20deg);
+  }
+}
+

@@ -1,0 +1,590 @@
+.container {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(180deg, #1a0a0a 0%, #2a1515 30%, #3d1f1f 60%, #1a0808 100%);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  perspective: 1200px;
+  padding: 2rem 1rem;
+}
+
+/* Red Curtains */
+.container::before,
+.container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 20%;
+  height: 50%;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      #8b1a1a 0px,
+      #a91d1d 15px,
+      #6d1414 30px,
+      #8b1a1a 45px
+    );
+  box-shadow: 
+    inset 0 0 60px rgba(0, 0, 0, 0.6),
+    0 10px 40px rgba(0, 0, 0, 0.8);
+  z-index: 50;
+}
+
+.container::before {
+  left: 0;
+  transform: skewY(-1deg);
+  border-right: 2px solid rgba(139, 26, 26, 0.5);
+}
+
+.container::after {
+  right: 0;
+  transform: skewY(1deg);
+  border-left: 2px solid rgba(139, 26, 26, 0.5);
+}
+
+/* Curtain drape details */
+.container {
+  box-shadow: 
+    inset 0 -150px 200px -50px rgba(139, 26, 26, 0.3),
+    inset 150px 0 200px -100px rgba(139, 26, 26, 0.2),
+    inset -150px 0 200px -100px rgba(139, 26, 26, 0.2);
+}
+
+.noVideo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #9ca3af;
+}
+
+.noVideo h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #e5e7eb;
+}
+
+/* Cinema Screen */
+.screen {
+  width: 85%;
+  max-width: 1100px;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  margin-bottom: 2rem;
+  transform: translateZ(0) rotateX(3deg);
+  z-index: 10;
+}
+
+.screenFrame {
+  width: 100%;
+  height: 100%;
+  background: #f5f5f0;
+  border: 1rem solid #0a0a0a;
+  border-bottom-width: 1.5rem;
+  box-shadow: 
+    0 0 100px rgba(200, 200, 180, 0.4),
+    0 20px 80px rgba(0, 0, 0, 0.9),
+    inset 0 0 80px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.screenFrame::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      rgba(0, 0, 0, 0.05) 60%,
+      rgba(0, 0, 0, 0.15) 100%
+    );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.player {
+  width: 100%;
+  height: 100%;
+}
+
+.screenGlow {
+  position: absolute;
+  top: -30%;
+  left: -20%;
+  right: -20%;
+  bottom: -10%;
+  background: radial-gradient(
+    ellipse at top center,
+    rgba(240, 240, 220, 0.25) 0%,
+    rgba(200, 200, 180, 0.15) 30%,
+    rgba(139, 26, 26, 0.08) 60%,
+    transparent 80%
+  );
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: -1;
+  animation: screenGlowPulse 3s ease-in-out infinite;
+}
+
+@keyframes screenGlowPulse {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* Seating Area */
+.seatingArea {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  transform-style: preserve-3d;
+  transform: rotateX(30deg);
+  padding: 3rem 1rem 2rem;
+  position: relative;
+}
+
+/* Red carpet floor effect */
+.seatingArea::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -10%;
+  right: -10%;
+  bottom: -20%;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      #8b1a1a 0px,
+      #a91d1d 2px,
+      #8b1a1a 4px
+    );
+  opacity: 0.4;
+  transform: translateZ(-100px);
+  filter: blur(1px);
+  pointer-events: none;
+}
+
+.seatingArea::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(10, 5, 5, 0.5) 80%,
+    rgba(5, 2, 2, 0.8) 100%
+  );
+  transform: translateZ(-50px);
+  pointer-events: none;
+}
+
+.seatRow {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  transform: 
+    translateZ(calc(var(--row-index) * -35px))
+    scale(calc(1 + var(--row-index) * 0.03));
+  animation: fadeInRow 0.6s ease-out backwards;
+  animation-delay: calc(var(--row-index) * 0.08s);
+}
+
+@keyframes fadeInRow {
+  from {
+    opacity: 0;
+    transform: 
+      translateZ(calc(var(--row-index) * -30px))
+      translateY(20px)
+      scale(calc(1 + var(--row-index) * 0.02));
+  }
+  to {
+    opacity: 1;
+    transform: 
+      translateZ(calc(var(--row-index) * -30px))
+      translateY(0)
+      scale(calc(1 + var(--row-index) * 0.02));
+  }
+}
+
+/* Individual Seats - Red Velvet Cinema Style */
+.seat {
+  width: 30px;
+  height: 34px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+}
+
+.seat:hover {
+  transform: translateY(-4px) scale(1.08);
+  filter: brightness(1.2) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.7));
+}
+
+.seatBack {
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 65%;
+  background: 
+    linear-gradient(180deg, 
+      #b91c1c 0%, 
+      #991b1b 30%,
+      #7f1d1d 70%,
+      #6d1414 100%
+    );
+  border-radius: 8px 8px 3px 3px;
+  box-shadow: 
+    inset 2px 2px 6px rgba(220, 80, 80, 0.4),
+    inset -2px -2px 6px rgba(0, 0, 0, 0.6),
+    0 2px 6px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(139, 26, 26, 0.8);
+}
+
+.seatBase {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48%;
+  background: 
+    linear-gradient(180deg, 
+      #991b1b 0%, 
+      #7f1d1d 40%,
+      #6d1414 100%
+    );
+  border-radius: 6px 6px 8px 8px;
+  box-shadow: 
+    inset 1px 1px 3px rgba(185, 28, 28, 0.3),
+    inset -1px -2px 4px rgba(0, 0, 0, 0.7),
+    0 4px 10px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(109, 20, 20, 0.9);
+}
+
+/* Empty Seats - Darker red */
+.seatEmpty .seatBack {
+  background: 
+    linear-gradient(180deg, 
+      #7f1d1d 0%, 
+      #6d1414 40%,
+      #5a1010 100%
+    );
+  box-shadow: 
+    inset 1px 1px 4px rgba(127, 29, 29, 0.3),
+    inset -1px -1px 4px rgba(0, 0, 0, 0.7),
+    0 2px 6px rgba(0, 0, 0, 0.6);
+  opacity: 0.7;
+}
+
+.seatEmpty .seatBase {
+  background: 
+    linear-gradient(180deg, 
+      #6d1414 0%, 
+      #5a1010 50%,
+      #450d0d 100%
+    );
+  box-shadow: 
+    inset 1px 1px 2px rgba(127, 29, 29, 0.2),
+    inset -1px -2px 4px rgba(0, 0, 0, 0.8),
+    0 4px 10px rgba(0, 0, 0, 0.7);
+  opacity: 0.7;
+}
+
+/* Assigned Seats (with viewers) - Brighter red with subtle glow */
+.seatAssigned .seatBack {
+  background: 
+    linear-gradient(180deg, 
+      #dc2626 0%, 
+      #b91c1c 30%,
+      #991b1b 70%,
+      #7f1d1d 100%
+    ) !important;
+  box-shadow: 
+    inset 2px 2px 6px rgba(239, 68, 68, 0.5),
+    inset -2px -2px 6px rgba(0, 0, 0, 0.6),
+    0 2px 8px rgba(220, 38, 38, 0.5),
+    0 0 20px rgba(220, 38, 38, 0.3) !important;
+  border: 1px solid rgba(185, 28, 28, 0.9);
+  opacity: 1 !important;
+}
+
+.seatAssigned .seatBase {
+  background: 
+    linear-gradient(180deg, 
+      #b91c1c 0%, 
+      #991b1b 40%,
+      #7f1d1d 100%
+    ) !important;
+  box-shadow: 
+    inset 1px 1px 3px rgba(220, 38, 38, 0.4),
+    inset -1px -2px 4px rgba(0, 0, 0, 0.7),
+    0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  opacity: 1 !important;
+}
+
+/* Lit Seats (impressed emotion) - Golden spotlight effect */
+.seatLit .seatBack {
+  background: 
+    linear-gradient(180deg, 
+      #fde047 0%,
+      #fbbf24 30%, 
+      #f59e0b 70%,
+      #d97706 100%
+    );
+  box-shadow: 
+    inset 2px 2px 8px rgba(255, 255, 255, 0.6),
+    inset -2px -2px 6px rgba(217, 119, 6, 0.6),
+    0 2px 12px rgba(251, 191, 36, 0.8),
+    0 0 35px rgba(251, 191, 36, 0.9),
+    0 0 60px rgba(251, 191, 36, 0.7),
+    0 0 90px rgba(251, 191, 36, 0.4);
+  border: 1px solid rgba(253, 224, 71, 0.8);
+  animation: seatPulse 0.5s ease-out;
+}
+
+.seatLit .seatBase {
+  background: 
+    linear-gradient(180deg, 
+      #fbbf24 0%, 
+      #f59e0b 50%,
+      #d97706 100%
+    );
+  box-shadow: 
+    inset 1px 1px 4px rgba(253, 224, 71, 0.5),
+    inset -1px -2px 4px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(251, 191, 36, 0.7),
+    0 0 25px rgba(251, 191, 36, 0.5);
+}
+
+.seatGlow {
+  position: absolute;
+  top: -80%;
+  left: -80%;
+  right: -80%;
+  bottom: -80%;
+  background: radial-gradient(
+    circle,
+    rgba(253, 224, 71, 0.8) 0%,
+    rgba(251, 191, 36, 0.5) 25%,
+    rgba(245, 158, 11, 0.3) 50%,
+    transparent 75%
+  );
+  filter: blur(25px);
+  pointer-events: none;
+  animation: glowPulse 0.7s ease-out;
+}
+
+@keyframes seatPulse {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  30% {
+    transform: scale(1.2);
+    filter: brightness(1.6);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes glowPulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.5);
+  }
+}
+
+/* Cinema Info & Legend */
+.cinemaInfo {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  background: rgba(26, 10, 10, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 26, 26, 0.4);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(185, 28, 28, 0.2);
+  z-index: 100;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+}
+
+.legendSeat {
+  width: 24px;
+  height: 28px;
+  border-radius: 4px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.legendSeat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 60%;
+  border-radius: 4px 4px 2px 2px;
+}
+
+.legendSeat::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  border-radius: 3px 3px 4px 4px;
+}
+
+.legendAssigned::before {
+  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+  box-shadow: 
+    inset 1px 1px 2px rgba(239, 68, 68, 0.4),
+    0 0 8px rgba(220, 38, 38, 0.3);
+}
+
+.legendAssigned::after {
+  background: linear-gradient(180deg, #b91c1c 0%, #991b1b 50%, #7f1d1d 100%);
+}
+
+.legendEmpty::before {
+  background: linear-gradient(180deg, #7f1d1d 0%, #6d1414 50%, #5a1010 100%);
+  opacity: 0.7;
+}
+
+.legendEmpty::after {
+  background: linear-gradient(180deg, #6d1414 0%, #5a1010 50%, #450d0d 100%);
+  opacity: 0.7;
+}
+
+.legendLit::before {
+  background: linear-gradient(180deg, #fde047 0%, #fbbf24 40%, #f59e0b 100%);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.9);
+}
+
+.legendLit::after {
+  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .screen {
+    width: 95%;
+    margin-bottom: 2rem;
+  }
+
+  .seatingArea {
+    transform: rotateX(20deg);
+    gap: 0.75rem;
+  }
+
+  .seat {
+    width: 24px;
+    height: 28px;
+  }
+
+  .cinemaInfo {
+    top: 1rem;
+    right: 1rem;
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem 0.5rem;
+  }
+
+  .screen {
+    width: 98%;
+    margin-bottom: 1.5rem;
+  }
+
+  .screenFrame {
+    border-width: 0.75rem;
+    border-bottom-width: 1rem;
+  }
+
+  .seatingArea {
+    transform: rotateX(15deg);
+    gap: 0.5rem;
+    padding: 1rem 0.5rem;
+  }
+
+  .seat {
+    width: 20px;
+    height: 24px;
+  }
+
+  .seatRow {
+    gap: 0.35rem;
+  }
+
+  .cinemaInfo {
+    top: 0.5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .legend {
+    gap: 0.5rem;
+  }
+
+  .legendItem {
+    font-size: 0.8rem;
+  }
+
+  .legendSeat {
+    width: 20px;
+    height: 24px;
+  }
+}

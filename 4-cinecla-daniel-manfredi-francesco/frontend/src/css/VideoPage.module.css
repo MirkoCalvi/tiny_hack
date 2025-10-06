@@ -1,0 +1,57 @@
+.container {
+  min-height: 100vh;
+  padding: 30px;
+  background: #0a0a0a;
+}
+
+.content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.header {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.dashboardButton {
+  padding: 14px 28px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  background: #10b981;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dashboardButton:hover {
+  background: #059669;
+}
+
+.devicesContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 24px;
+  color: #888;
+}
