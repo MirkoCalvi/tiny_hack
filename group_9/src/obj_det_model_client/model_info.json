@@ -1,0 +1,96 @@
+{
+    "name": "obj_detect_hack",
+    "model_family": "fai_detr",
+    "classes": [
+        "pen",
+        "can",
+        "smartphone",
+        "glasses",
+        "box"
+    ],
+    "im_size": 640,
+    "task": "detection",
+    "config": {
+        "num_classes": 5,
+        "backbone_config": {
+            "use_pretrained": false,
+            "backbone_url": null,
+            "model_type": "stdc",
+            "in_chans": 3,
+            "base": 64,
+            "layers": [
+                4,
+                5,
+                3
+            ],
+            "out_features": [
+                "res2",
+                "res3",
+                "res4",
+                "res5"
+            ],
+            "block_num": 4,
+            "block_type": "cat",
+            "size": null,
+            "use_conv_last": false
+        },
+        "num_queries": 300,
+        "resolution": 640,
+        "pixel_mean": [
+            123.675,
+            116.28,
+            103.53
+        ],
+        "pixel_std": [
+            58.395,
+            57.12,
+            57.375
+        ],
+        "size_divisibility": 0,
+        "pixel_decoder_out_dim": 128,
+        "pixel_decoder_feat_dim": 128,
+        "pixel_decoder_num_encoder_layers": 0,
+        "pixel_decoder_expansion": 1.0,
+        "pixel_decoder_dim_feedforward": 1024,
+        "transformer_predictor_out_dim": 128,
+        "transformer_predictor_hidden_dim": 256,
+        "transformer_predictor_dec_layers": 3,
+        "transformer_predictor_dim_feedforward": 1024,
+        "head_out_dim": 128,
+        "pixel_decoder_dropout": 0.0,
+        "pixel_decoder_nhead": 8,
+        "transformer_predictor_nhead": 8,
+        "threshold": 0.5,
+        "top_k": 300,
+        "criterion_deep_supervision": true,
+        "criterion_eos_coef": 0.1,
+        "criterion_losses": [
+            "vfl",
+            "boxes"
+        ],
+        "criterion_num_points": 0,
+        "criterion_focal_alpha": 0.75,
+        "criterion_focal_gamma": 2.0,
+        "weight_dict_loss_vfl": 1,
+        "weight_dict_loss_bbox": 5,
+        "weight_dict_loss_giou": 2,
+        "matcher_cost_class": 2,
+        "matcher_cost_bbox": 5,
+        "matcher_cost_giou": 2,
+        "matcher_use_focal_loss": true,
+        "matcher_alpha": 0.25,
+        "matcher_gamma": 2.0
+    },
+    "ref": "a91ce1c3ef164140",
+    "focoos_model": "fai-detr-m-coco",
+    "status": "TRAINING_COMPLETED",
+    "description": "🤖 A pixel wizard that sees what others can't!",
+    "train_args": null,
+    "weights_uri": null,
+    "val_dataset": null,
+    "val_metrics": null,
+    "focoos_version": null,
+    "latency": null,
+    "training_info": null,
+    "updated_at": "2025-10-04T16:40:18.907000Z"
+}
