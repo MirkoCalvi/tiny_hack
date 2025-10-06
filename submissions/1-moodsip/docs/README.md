@@ -51,7 +51,7 @@ The architecture integrates both **edge** and **cloud** AI components for balanc
 
 ## 4. Facial Expression Analysis
 
-<img src="../assets/classification_model.png" alt="MoodSip Prototype" width="600"/>
+<img src="../assets/classification-model.png" alt="MoodSip Prototype" width="600"/>
 
 ### 4.1 Two-Stage Structure
 
