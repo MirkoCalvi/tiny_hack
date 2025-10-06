@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}MelaNoMore - Skin Cancer Detection{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="summary-cards">
+        <div class="summary-card critical">
+            <div class="card-icon">🔴</div>
+            <div class="card-content">
+                <h3>Malignant</h3>
+                <p class="card-number">{{ summary.malignant }}</p>
+                <p class="card-label">Immediate intervention required</p>
+            </div>
+        </div>
+        <div class="summary-card high">
+            <div class="card-icon">🟠</div>
+            <div class="card-content">
+                <h3>Premalignant</h3>
+                <p class="card-number">{{ summary.premalignant }}</p>
+                <p class="card-label">Precancerous lesions</p>
+            </div>
+        </div>
+        <div class="summary-card medium">
+            <div class="card-icon">🟢</div>
+            <div class="card-content">
+                <h3>Benign</h3>
+                <p class="card-number">{{ summary.benign }}</p>
+                <p class="card-label">Non-cancerous lesions</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <aside class="case-list-panel">
+            <div class="panel-header">
+                <h2>Recent Cases</h2>
+                <div class="filter-controls">
+                    <select id="categoryFilter" class="risk-filter">
+                        <option value="all">All Categories</option>
+                        <option value="malignant">🔴 Malignant</option>
+                        <option value="premalignant">🟠 Premalignant</option>
+                        <option value="benign">🟢 Benign</option>
+                    </select>
+                </div>
+            </div>
+            <div class="case-list">
+                {% if cases %}
+                {% for case in cases %}
+                <div class="case-item {% if case.capture_id == selected_case %}active{% endif %} category-{{ case.metadata.category }}"
+                    data-capture-id="{{ case.capture_id }}" data-category="{{ case.metadata.category }}">
+                    <div class="case-priority">
+                        <span class="priority-badge priority-{{ case.metadata.priority }}">P{{ case.metadata.priority
+                            }}</span>
+                    </div>
+                    <div class="case-info">
+                        <h3 class="case-title">{{ case.metadata.classification|replace('_', ' ')|title }}</h3>
+                        <p class="case-id">ID: {{ case.capture_id[:12] }}...</p>
+                        <div class="case-meta">
+                            <span class="meta-item"><span class="meta-icon">📅</span>{{ case.received_at_utc[:10] if
+                                case.received_at_utc else 'N/A' }}</span>
+                            <span class="meta-item"><span class="meta-icon">🎯</span>{{ (case.metadata.confidence *
+                                100)|round(1) }}%</span>
+                        </div>
+                        <div class="risk-indicator risk-{{ case.metadata.risk_level }}">{{
+                            case.metadata.risk_level|upper }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <p>📭 No cases found</p>
+                    <p class="empty-subtitle">New captures will appear here</p>
+                </div>
+                {% endif %}
+            </div>
+        </aside>
+
+        <section class="case-detail-panel">
+            {% if selected_metadata %}
+            <div class="detail-header">
+                <div class="detail-title-section">
+                    <h2>Case Analysis</h2>
+                    <p class="case-detail-id">{{ selected_metadata.capture_id }}</p>
+                </div>
+                <div class="detail-actions">
+                    <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button>
+                    <a href="{{ url_for('capture_image', capture_id=selected_metadata.capture_id) }}"
+                        class="btn btn-primary" download>💾 Download Image</a>
+                </div>
+            </div>
+            <div class="image-viewer-container">
+                <div class="image-viewer">
+                    {% if image_data %}
+                    <img src="data:image/png;base64,{{ image_data }}" alt="Lesion capture" class="lesion-image">
+                    {% elif image_error %}
+                    <div class="image-placeholder error">
+                        <p>⚠️ Image Loading Error</p>
+                        <p class="error-detail">{{ image_error }}</p>
+                        <p class="error-hint">💡 Check that Arduino is sending image data correctly</p>
+                    </div>
+                    {% else %}
+                    <div class="image-placeholder">
+                        <p>📷 Image not available</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="classification-section">
+                <h3>🏥 AI Classification Results</h3>
+                <div class="classification-card risk-{{ selected_metadata.risk_level }}">
+                    <div class="classification-primary">
+                        <div class="diagnosis-label">Detected Lesion Type</div>
+                        <div class="diagnosis-value">{{ selected_metadata.classification|replace('_', ' ')|title }}
+                        </div>
+                        {% if selected_metadata.category %}
+                        <div class="diagnosis-category">
+                            {% if selected_metadata.category == 'malignant' %}<span class="category-badge malignant">🔴
+                                Malignant</span>{% endif %}
+                            {% if selected_metadata.category == 'premalignant' %}<span
+                                class="category-badge premalignant">🟠 Premalignant</span>{% endif %}
+                            {% if selected_metadata.category == 'benign' %}<span class="category-badge benign">🟢
+                                Benign</span>{% endif %}
+                        </div>
+                        {% endif %}
+                        {% if selected_metadata.description %}<p class="diagnosis-description">{{
+                            selected_metadata.description }}</p>{% endif %}
+                    </div>
+                    <div class="classification-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Confidence Score</span>
+                            <span class="detail-value">
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill"
+                                        style="width: {{ (selected_metadata.confidence * 100)|round(1) }}%"></div>
+                                </div>
+                                {{ (selected_metadata.confidence * 100)|round(1) }}%
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Risk Level</span>
+                            <span class="detail-value"><span
+                                    class="risk-badge risk-{{ selected_metadata.risk_level }}">{{
+                                    selected_metadata.risk_level|upper }}</span></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Priority</span>
+                            <span class="detail-value"><span
+                                    class="priority-badge priority-{{ selected_metadata.priority }}">P{{
+                                    selected_metadata.priority }}</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="recommendations">
+                    <h4>📋 Recommended Actions</h4>
+                    {% if selected_metadata.risk_level == 'critical' %}
+                    <div class="recommendation-item urgent"><span class="rec-icon">⚠️</span>
+                        <div class="rec-content"><strong>Immediate dermatologist consultation required</strong>
+                            <p>High suspicion of melanoma. Schedule biopsy within 24-48 hours.</p>
+                        </div>
+                    </div>
+                    {% elif selected_metadata.risk_level == 'high' %}
+                    <div class="recommendation-item warning"><span class="rec-icon">🟠</span>
+                        <div class="rec-content"><strong>Specialist evaluation recommended</strong>
+                            <p>Potential malignancy detected. Schedule consultation within 1-2 weeks.</p>
+                        </div>
+                    </div>
+                    {% elif selected_metadata.risk_level == 'medium' %}
+                    <div class="recommendation-item caution"><span class="rec-icon">🟡</span>
+                        <div class="rec-content"><strong>Monitor and follow-up</strong>
+                            <p>Precancerous changes possible. Schedule follow-up in 3-6 months.</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="recommendation-item info"><span class="rec-icon">ℹ️</span>
+                        <div class="rec-content"><strong>Routine monitoring</strong>
+                            <p>Benign lesion detected. Regular skin checks recommended.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="technical-details">
+                <h3>🔬 Technical Details</h3>
+                <div class="details-grid">
+                    <div class="detail-row"><span class="detail-label">Device ID</span><span class="detail-value">{{
+                            selected_metadata.device_id or 'N/A' }}</span></div>
+                    <div class="detail-row"><span class="detail-label">Capture Time</span><span class="detail-value">{{
+                            selected_metadata.received_at_utc or 'N/A' }}</span></div>
+                    <div class="detail-row"><span class="detail-label">Image Format</span><span class="detail-value">{{
+                            selected_metadata.image_format or 'N/A' }}</span></div>
+                    <div class="detail-row"><span class="detail-label">Resolution</span><span class="detail-value">{% if
+                            selected_metadata.width and selected_metadata.height %}{{ selected_metadata.width }} × {{
+                            selected_metadata.height }}{% else %}N/A{% endif %}</span></div>
+                    <div class="detail-row"><span class="detail-label">Model Version</span><span class="detail-value">{{
+                            selected_metadata.model_version or 'N/A' }}</span></div>
+                    <div class="detail-row"><span class="detail-label">Suspicion Score</span><span
+                            class="detail-value">{{ '%.3f'|format(selected_metadata.score) if selected_metadata.score
+                            else 'N/A' }}</span></div>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-detail-state">
+                <div class="empty-icon">📋</div>
+                <h3>No Case Selected</h3>
+                <p>Select a case from the list to view detailed analysis</p>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}

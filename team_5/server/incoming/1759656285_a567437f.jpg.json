@@ -1,0 +1,40 @@
+{
+  "device_id": "nicla01",
+  "score": 0.72,
+  "capture_id": "1759656285_a567437f",
+  "received_at_utc": "2025-10-05T09:24:45.944398Z",
+  "original_filename": "test_lesione.jpg",
+  "content_type": "image/jpeg",
+  "content_length": 25231,
+  "stored_filename": "1759656285_a567437f.jpg",
+  "image_format": "JPEG",
+  "width": 640,
+  "height": 640,
+  "classification": "Vascular_lesions",
+  "category": "benign",
+  "description": "Lesioni vascolari benigne",
+  "confidence": 0.921,
+  "risk_level": "low",
+  "priority": 4,
+  "model_version": "vit_large_patch16_384_v1",
+  "classified_at": "2025-10-05T09:24:48.307780Z",
+  "inference_provider": "SkinCancerPredictor",
+  "inference_latency_ms": 2360.34,
+  "raw_predictions": [
+    {
+      "class": "Vascular_lesions",
+      "friendly_name": "Vascular Lesions",
+      "confidence": 0.9206181168556213
+    },
+    {
+      "class": "Melanoma",
+      "friendly_name": "Melanoma",
+      "confidence": 0.05682648718357086
+    },
+    {
+      "class": "Benign_keratosis-like_lesions",
+      "friendly_name": "Benign Keratosis-like Lesions",
+      "confidence": 0.01199794840067625
+    }
+  ]
+}
