@@ -64,6 +64,13 @@ team-number-project-name/ (example: 7-cool-object-detection)
 ## 🚀 Technical Trophy
 *Most technically impressive or groundbreaking implementation*
 
+# 🏆 Winners 🏆
+
+1. [MelaNoMore](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/5-melanomore)
+
+2. [SpaceDebris](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/8-space-debris)
+
+3. [CineCla](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/4-cinecla) & [MoodSip](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/1-mood-sip)
 
 # Some Food for Thought
 
