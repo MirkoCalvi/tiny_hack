@@ -1,0 +1,12 @@
+[project]
+name = "model"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "focoos[onnx-cpu]",
+]
+
+[tool.uv.sources]
+focoos = { git = "https://github.com/FocoosAI/focoos" }

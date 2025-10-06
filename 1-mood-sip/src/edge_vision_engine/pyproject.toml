@@ -1,0 +1,14 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.118.0",
+    "google-genai>=1.41.0",
+    "ollama>=0.6.0",
+    "pillow>=11.3.0",
+    "python-multipart>=0.0.20",
+    "uvicorn>=0.37.0",
+]

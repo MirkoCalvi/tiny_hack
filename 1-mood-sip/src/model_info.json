@@ -1,0 +1,68 @@
+{
+    "name": "prva1",
+    "model_family": "fai_cls",
+    "classes": [
+        "background",
+        "humans"
+    ],
+    "im_size": 96,
+    "task": "classification",
+    "config": {
+        "num_classes": 2,
+        "backbone_config": {
+            "use_pretrained": false,
+            "backbone_url": "https://public.focoos.ai/pretrained_models/backbones/stdc_nano.pth",
+            "model_type": "stdc",
+            "in_chans": 3,
+            "base": 64,
+            "layers": [
+                4,
+                5,
+                3
+            ],
+            "out_features": [
+                "res2",
+                "res3",
+                "res4",
+                "res5"
+            ],
+            "block_num": 4,
+            "block_type": "cat",
+            "size": "nano",
+            "use_conv_last": false
+        },
+        "resolution": 224,
+        "pixel_mean": [
+            123.675,
+            116.28,
+            103.53
+        ],
+        "pixel_std": [
+            58.395,
+            57.12,
+            57.375
+        ],
+        "hidden_dim": 512,
+        "dropout_rate": 0.2,
+        "features": "res4",
+        "num_layers": 1,
+        "dense_prediction": false,
+        "use_focal_loss": false,
+        "focal_alpha": 0.75,
+        "focal_gamma": 2.0,
+        "label_smoothing": 0.0,
+        "pos_weight": 2.0
+    },
+    "ref": "f73c51dfb3bd422f",
+    "focoos_model": "fai-cls-n-coco",
+    "status": "TRAINING_COMPLETED",
+    "description": "🤖 A pixel wizard that sees what others can't!",
+    "train_args": null,
+    "weights_uri": "/Users/u464645/FocoosAI/models/f73c51dfb3bd422f/model_final.pth",
+    "val_dataset": null,
+    "val_metrics": null,
+    "focoos_version": null,
+    "latency": null,
+    "training_info": null,
+    "updated_at": "2025-10-04T23:28:43.463000Z"
+}
