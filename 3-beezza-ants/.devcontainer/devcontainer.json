@@ -1,0 +1,25 @@
+{
+    "name": "BeezzaAnts Development Container",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/python:1": {},
+        "ghcr.io/jsburckhardt/devcontainer-features/uv:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {}
+        },
+        "extensions": [
+            "mhutchie.git-graph",
+            "ms-azuretools.vscode-containers",
+            "ms-vscode.cmake-tools",
+            "ms-vscode.cpptools",
+            "ziglang.vscode-zig"
+        ]
+    },
+    "forwardPorts": [],
+    "remoteUser": "vscode"
+}
