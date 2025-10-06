@@ -1,0 +1,4 @@
+[submodule "Z-Ant"]
+	path = Z-Ant
+	url = git@github.com:ezmi234/Z-Ant.git
+	branch = main
