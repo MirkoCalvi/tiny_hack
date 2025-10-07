@@ -70,7 +70,7 @@ team-number-project-name/ (example: 7-cool-object-detection)
 
 2. [SpaceDebris](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/8-space-debris)
 
-3. [CineCla](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/4-cinecla) & [MoodSip](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/1-mood-sip)
+3. [CineCla](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/4-cinecla) & [MoodSip](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/1-moodsip)
 
 # Some Food for Thought
 
