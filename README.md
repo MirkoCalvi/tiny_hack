@@ -66,11 +66,13 @@ team-number-project-name/ (example: 7-cool-object-detection)
 
 # 🏆 Winners 🏆
 
-1. [MelaNoMore](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/5-melanomore)
+1. [MelaNoMore](./submissions/5-melanomore)
 
-2. [SpaceDebris](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/8-space-debris)
+2. [SpaceDebris](./submissions/8-space-debris)
 
-3. [CineCla](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/4-cinecla) & [MoodSip](https://github.com/MirkoCalvi/tiny_hack/tree/main/submissions/1-moodsip)
+3. [CineCla](./submissions/4-cinecla) & [MoodSip](./submissions/1-moodsip)
+
+You can check out all the amazing projects [here](./submissions).
 
 # Some Food for Thought
 
